@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  version: 1.0.0
+servers:
+  - url: http://localhost/api/v1
+    description: Optional server description, e.g. Main (production) server
+paths
+  /file/:
+  /file:
+    get:
+      operationId: getFiles
+      summary: Returns a list of file uploaded
+      description: File uploaded
+      responses:
+        '200':
+          description: A JSON array file uploaded
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      operationId: uploadFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: string
+                  format: string
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '200': # status code
+          description: A JSON array of user names
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+  /glue:
+    get:
+      operationId: getGlues
+      summary: Returns a list of glue.
+      description: List of keyword glue
+      responses:
+        '200':
+          description: A JSON array of glue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

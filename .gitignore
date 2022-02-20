@@ -1,0 +1,13 @@
+/.idea/
+/.workspace/
+*/*.iml
+*.iml
+
+**/node_modules/*
+**/.angular/*
+**/.vscode/*
+**/dist/*
+**/target/*
+/frontend/src/app/api/
+/frontend/.vscode/
+/frontend/node/*
