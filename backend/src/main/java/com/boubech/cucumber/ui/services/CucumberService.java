@@ -4,6 +4,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +28,7 @@ public class CucumberService {
         this.classLoaderCustom = classLoaderCustom;
     }
 
-    public List<String> getGlues() {
+    public List<String> getGluesDefinitions() {
         try {
             return this.classLoaderCustom.getClasses()
                     .stream()
@@ -48,6 +49,14 @@ public class CucumberService {
                 .collect(Collectors.toList());
     }
 
+
+    private List<Class<?>> getCucumberGlueClass() throws IOException {
+        return this.classLoaderCustom.getClasses()
+                .stream()
+                .filter(clazz -> Arrays.stream(clazz.getMethods()).anyMatch(method -> getStepValue(method).isPresent()))
+                .collect(Collectors.toList());
+    }
+
     private Optional<String> getStepValue(Method method) {
         Optional<Class<Annotation>> optionalAnnotation = CUCUMBER_ANNOTATION.stream()
                 .filter(method::isAnnotationPresent)
@@ -61,5 +70,17 @@ public class CucumberService {
                 return null;
             }
         });
+    }
+
+    public void runFeature(File feature) throws IOException {
+        List<Class<?>> gluesClasses = getCucumberGlueClass();
+        String[] args = new String[gluesClasses.size() * 2 + 1];
+        int index = 0;
+        for(Class<?> clazz:gluesClasses) {
+            args[++index] = "-g";
+            args[++index] = clazz.getName();
+        }
+        args[index] = feature.getAbsolutePath();
+        io.cucumber.core.cli.Main.run(args, classLoaderCustom.getClassLoader());
     }
 }

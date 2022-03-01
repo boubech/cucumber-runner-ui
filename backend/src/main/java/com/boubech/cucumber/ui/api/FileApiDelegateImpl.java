@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class FileApiDelegateImpl implements FileApiDelegate {
+public class FileApiDelegateImpl implements FilesApiDelegate {
 
     private final WorkspaceService workspaceService;
 

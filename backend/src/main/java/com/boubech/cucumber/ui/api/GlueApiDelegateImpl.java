@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class GlueApiDelegateImpl implements GlueApiDelegate {
+public class GlueApiDelegateImpl implements GluesApiDelegate {
 
     private final CucumberService cucumberService;
 
@@ -18,7 +18,7 @@ public class GlueApiDelegateImpl implements GlueApiDelegate {
 
     @Override
     public ResponseEntity<List<String>> getGlues() {
-        List<String> body = this.cucumberService.getGlues();
+        List<String> body = this.cucumberService.getGluesDefinitions();
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 }

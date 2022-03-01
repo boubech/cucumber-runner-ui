@@ -38,7 +38,7 @@ export class CucumberUiComponent implements OnInit {
                     .subscribe(result => this.files = result);
   }
   refreshGlues(): void {
-    this.apiService .glueGet()
+    this.apiService .getGlues()
                     .subscribe(result => this.glues = result);
   }
 }

@@ -6,9 +6,8 @@ info:
 servers:
   - url: http://localhost/api/v1
     description: Optional server description, e.g. Main (production) server
-paths
-  /file/:
-  /file:
+paths:
+  /files:
     get:
       operationId: getFiles
       summary: Returns a list of file uploaded
@@ -46,11 +45,32 @@ paths
               schema:
                 type: string
                 example: pong
-  /glue:
+  /glues:
     get:
       operationId: getGlues
       summary: Returns a list of glue.
       description: List of keyword glue
+      responses:
+        '200':
+          description: A JSON array of glue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /features:
+    post:
+      operationId: runFeature
+      summary: Returns a list of glue.
+      description: List of keyword glue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
       responses:
         '200':
           description: A JSON array of glue
