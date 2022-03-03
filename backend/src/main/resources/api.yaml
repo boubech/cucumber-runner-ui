@@ -4,7 +4,7 @@ info:
   description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
   version: 1.0.0
 servers:
-  - url: http://localhost/api/v1
+  - url: http://localhost:4200/api/v1
     description: Optional server description, e.g. Main (production) server
 paths:
   /files:
@@ -20,7 +20,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: "#/components/schemas/FileResponse"
     post:
       operationId: uploadFile
       requestBody:
@@ -62,21 +62,99 @@ paths:
   /features:
     post:
       operationId: runFeature
-      summary: Returns a list of glue.
-      description: List of keyword glue
+      summary: Execute a feature
+      description: Execute a feature
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
+              $ref: "#/components/schemas/FeatureRunnerRequest"
       responses:
         '200':
-          description: A JSON array of glue
+          description: Return log execution
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                $ref: "#/components/schemas/FeatureRunnerResponse"
+  /html-reports/{reportHtmlId}:
+    get:
+      operationId: getHtmlReport
+      summary: get html report from execution
+      description: get html report from execution
+      parameters:
+        - in: path
+          name: reportHtmlId
+          description: HTML Report Identifier
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: HTML Report
+          content:
+            text/html:
+              schema:
+                type: string
+
+components:
+  schemas:
+    FileResponse:
+      type: object
+      required:
+        - name
+        - path
+        - isDirectory
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        isDirectory:
+          type: boolean
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileResponse"
+
+    FeatureRunnerRequest:
+      type: object
+      required:
+        - feature
+      properties:
+        feature:
+          type: array
+          items:
+            type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatureRunnerResponse"
+    FeatureRunnerOptionRequest:
+      type: object
+      properties:
+        code:
+          type: string
+        text:
+          type: string
+    FeatureRunnerResponse:
+      type: object
+      required:
+        - id
+        - reportHtml
+        - reportJson
+        - reportPretty
+      properties:
+        id:
+          type: integer
+          format: int64
+        reportHtmlId:
+          type: integer
+          format: int64
+        reportJson:
+          type: array
+          items:
+            type: string
+        reportPretty:
+          type: array
+          items:
+            type: string

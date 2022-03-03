@@ -1,0 +1,38 @@
+<h1>Java</h1>
+<input type="file" name="flue" accept="*/*" (change)="onFileSelected($event)"/>
+<input type="button" name="upload" value="Upload Jar" (click)="uploadFile()"/>
+
+<h1>Workspace</h1>
+
+<app-file-explorer [files]="files"></app-file-explorer>
+
+<ul class="files">
+  <li *ngFor="let file of files">
+    <span class="file">{{file.name}}</span>
+  </li>
+</ul>
+
+
+<h1>Glues</h1>
+<ul class="glues">
+  <li *ngFor="let glue of glues">
+    <span class="glue">{{glue}}</span>
+  </li>
+</ul>
+
+
+<h1>Editor</h1>
+<textarea [(ngModel)]='featureText' class="feature-console">
+</textarea>
+<input type="button" name="execute" value="execute" (click)="executeFeature()"/>
+
+<h1>Console</h1>
+
+<app-console [featureRunnerResponse]="featureRunnerResponse">
+</app-console>
+
+<h1>Rapport HTML</h1>
+<app-html-report [featureRunnerResponse]="featureRunnerResponse">
+</app-html-report>
+
+

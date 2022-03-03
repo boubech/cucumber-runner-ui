@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  uiVersion: require('../../package.json').version + '-dev',
+  production: false,
+  baseUrl : '/api'
 };
 
 /*

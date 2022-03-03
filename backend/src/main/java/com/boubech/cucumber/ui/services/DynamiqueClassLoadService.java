@@ -16,17 +16,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Component
-public class ClassLoaderCustom {
+public class DynamiqueClassLoadService {
 
-    private final ClassLoader classLoader;
     private final WorkspaceService workspaceService;
 
-    public ClassLoaderCustom(WorkspaceService workspaceService) {
+    public DynamiqueClassLoadService(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
-        this.classLoader = init();
     }
 
-    private URLClassLoader init() {
+    public URLClassLoader get() {
         List<File> files = this.workspaceService.listFiles();
         URL[] url = files.stream()
                 .map(File::toURI)
@@ -43,13 +41,13 @@ public class ClassLoaderCustom {
     }
 
     public List<Class<?>> getClasses() throws IOException {
+        final URLClassLoader classLoader = get();
         return getClassNames()
                 .stream()
                 .map(className -> {
                     try {
                         return classLoader.loadClass(className);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
+                    } catch (ClassNotFoundException | NoClassDefFoundError e) {
                         return null;
                     }
                 })
@@ -60,7 +58,7 @@ public class ClassLoaderCustom {
     private List<String> getClassNames() throws IOException {
         List<String> classNames = new ArrayList<>();
 
-        for(File file : this.workspaceService.listFiles()) {
+        for (File file : this.workspaceService.listFiles()) {
             if (!file.getName().endsWith(".jar")) {
                 continue;
             }
@@ -77,8 +75,5 @@ public class ClassLoaderCustom {
         return classNames;
     }
 
-    public ClassLoader getClassLoader() {
-        return this.classLoader;
-    }
 
 }

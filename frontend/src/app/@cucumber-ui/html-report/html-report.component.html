@@ -1,0 +1,3 @@
+<div *ngIf="htmlReportUrl">
+  <embed class="html-report" type="text/html" [src]="htmlReportUrl | safeResourceUrl"  />
+</div>

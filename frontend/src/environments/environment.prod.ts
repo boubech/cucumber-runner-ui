@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  uiVersion: require('../../package.json').version,
+  production: true,
+  baseUrl : '/api'
 };

@@ -1,0 +1,4 @@
+<div class="file" (click)="showOrHideDirectoryContent()">{{file!.name}}</div>
+<div class="directory" *ngIf="file!.isDirectory" [style.display]="hideDirectoryContent">
+  <app-file-item class="subfile" *ngFor="let subfile of file!.files" [file]="subfile"></app-file-item>
+</div>
