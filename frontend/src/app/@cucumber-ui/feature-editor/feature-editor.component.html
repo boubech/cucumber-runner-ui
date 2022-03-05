@@ -1,0 +1,43 @@
+<section>
+  <header>
+    <span>Gherkin Editor</span>
+    <span>|</span>
+    <span>
+       <mat-icon name="start" *ngIf="!running" aria-hidden="false" aria-label="start" (click)="executeFeature()">play_circle_outline</mat-icon>
+       <mat-icon name="stop" *ngIf="running" aria-hidden="false" aria-label="stop">stop</mat-icon>
+    </span>
+  </header>
+
+
+  <div
+    class="app-ace-editor content"
+    #editorDiv
+  ></div>
+
+  <!--
+
+  <div class="content"  [contentEditable]="true" (input)="editorOnChange()"  >
+    <div class="line">example</div>
+  </div>
+  -->
+  <!--
+
+  <div class="content" #editorDiv [contentEditable]="true" (input)="editorOnChange()" (keydown.enter)="onKeydown($event)" >
+  </div>
+
+  <div class="content" #editorDiv>
+    <div *ngFor="let line of lines; let index = index;" class="line">
+      <span>{{index}}</span><input type="text" [(ngModel)]="line.value" (keydown.enter)="onKeydownLine($event)" />
+    </div>
+    <div class="blank" (click)="editorOnClick()">
+    </div>
+  </div>
+  -->
+
+  <footer>
+
+  </footer>
+</section>
+
+
+

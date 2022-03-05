@@ -10,18 +10,19 @@ export class FileItemComponent implements OnInit {
 
   @Input() file: FileResponse | undefined;
 
-  hideDirectoryContent: string = "none";
+  hideDirectoryContent: boolean = true;
+  isFocused: boolean = false;
 
   constructor() { }
 
   ngOnInit(): void {
   }
   showOrHideDirectoryContent() {
-    if (this.hideDirectoryContent == "none") {
-      this.hideDirectoryContent = "block"
-    } else {
-      this.hideDirectoryContent = "none";
-    }
+    this.hideDirectoryContent = !this.hideDirectoryContent;
   }
 
+  focusChange(isFocused: boolean) {
+    this.isFocused = isFocused;
+    console.log(this.isFocused)
+  }
 }

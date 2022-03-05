@@ -34,12 +34,9 @@ public class WorkspaceService {
         return workspaceFolder.list();
     }
 
-    public List<File> getFiles() {
-        return List.of(workspaceFolder.listFiles());
-    }
 
-    public List<File> listFiles() {
-        return Arrays.stream(Objects.requireNonNull(workspaceFolder.listFiles())).collect(Collectors.toList());
+    public File getRoot() {
+        return workspaceFolder;
     }
 
 
@@ -68,5 +65,9 @@ public class WorkspaceService {
 
     public Optional<TestExecutionContext> findTestExecutionContextById(Integer reportId) {
         return this.testExecutionContexts.stream().filter(testExecutionContext -> testExecutionContext.getIdentifier() == reportId).findFirst();
+    }
+
+    public List<File> listFiles() {
+        return List.of(this.getRoot().listFiles());
     }
 }

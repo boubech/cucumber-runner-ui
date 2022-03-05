@@ -1,12 +1,43 @@
 
+.toolbar {
+  background-color: lightgreen;
+}
 
+.bottom-bar {
 
-.editor {
+}
+
+.bottom-bar mat-tab-group {
   width: 100%;
 }
 
-.feature-console {
+.mat-tab-group {
+  height: 100%;
+}
+
+
+.editor {
+  background-color: #cccccc;
+}
+
+.explorer {
+  background-color: #cccccc;
+}
+
+.explorer {
+  overflow: auto;
+}
+
+.explorer app-file-explorer {
   width: 100%;
-  min-height: 10pc;
+}
+
+.explorer app-file-explorer {
+  height: 100%;
+}
+
+app-feature-editor {
+  height: 100%;
+  width: 100%;
 }
 

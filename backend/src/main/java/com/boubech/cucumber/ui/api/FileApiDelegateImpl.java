@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,10 +40,8 @@ public class FileApiDelegateImpl implements FilesApiDelegate {
 
     @Override
     public ResponseEntity<List<FileResponse>> getFiles() {
-        List<FileResponse> body = workspaceService.listFiles().stream()
-                .map(this::convertFileToFileResponse)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        List<FileResponse> fileReponse = Collections.singletonList(convertFileToFileResponse(workspaceService.getRoot()));
+        return new ResponseEntity<>(fileReponse, HttpStatus.OK);
     }
 
 
@@ -51,7 +50,10 @@ public class FileApiDelegateImpl implements FilesApiDelegate {
         fileResponse.setName(file.getName());
         fileResponse.setPath(file.getPath());
         fileResponse.isDirectory(file.isDirectory());
-        fileResponse.setFiles(file.isDirectory() ? Arrays.stream(Objects.requireNonNull(file.listFiles())).map(this::convertFileToFileResponse).collect(Collectors.toList()) : null);
+        fileResponse.setFiles(file.isDirectory() ? Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                .map(this::convertFileToFileResponse)
+                .sorted((f1, f2) -> String.CASE_INSENSITIVE_ORDER.compare(f1.getName(), f2.getName()))
+                .collect(Collectors.toList()) : null);
         return fileResponse;
     }
 

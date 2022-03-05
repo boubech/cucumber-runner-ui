@@ -14,6 +14,10 @@ import {ConsoleUiComponent} from "./@cucumber-ui/console-ui/console-ui.component
 import {SafeResourceUrlPipe} from "./@cucumber-ui/pipe/safe-resource-url.pipe";
 import {CucumberUiModule} from "./@cucumber-ui/cucumber-ui.module";
 import {HtmlReportComponent} from "./@cucumber-ui/html-report/html-report.component";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatIconModule} from "@angular/material/icon";
+import {MatGridListModule} from "@angular/material/grid-list";
+import {MatTabsModule} from "@angular/material/tabs";
 
 @NgModule({
   declarations: [
@@ -26,14 +30,18 @@ import {HtmlReportComponent} from "./@cucumber-ui/html-report/html-report.compon
     SpaceToHtml,
     SafeResourceUrlPipe
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    CommonModule,
-    CucumberUiModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        CommonModule,
+        CucumberUiModule,
+        BrowserAnimationsModule,
+        MatIconModule,
+        MatGridListModule,
+        MatTabsModule,
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

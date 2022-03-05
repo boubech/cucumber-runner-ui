@@ -1,16 +1,3 @@
-<h1>Java</h1>
-<input type="file" name="flue" accept="*/*" (change)="onFileSelected($event)"/>
-<input type="button" name="upload" value="Upload Jar" (click)="uploadFile()"/>
-
-<h1>Workspace</h1>
-
-<app-file-explorer [files]="files"></app-file-explorer>
-
-<ul class="files">
-  <li *ngFor="let file of files">
-    <span class="file">{{file.name}}</span>
-  </li>
-</ul>
 
 
 <h1>Glues</h1>
@@ -21,18 +8,27 @@
 </ul>
 
 
-<h1>Editor</h1>
-<textarea [(ngModel)]='featureText' class="feature-console">
-</textarea>
-<input type="button" name="execute" value="execute" (click)="executeFeature()"/>
+<mat-grid-list cols="4">
+  <mat-grid-tile colspan="1" class="explorer" *ngIf="files.length > 0">
+    <app-file-explorer [files]="files[0].files" (fileUploaded)="refresh()"></app-file-explorer>
+  </mat-grid-tile>
+  <mat-grid-tile colspan="3" class="editor">
+    <app-feature-editor (onChange)="onFeatureEditorChange($event)"></app-feature-editor>
+  </mat-grid-tile>
+  <mat-grid-tile colspan="4" class="bottom-bar">
+    <mat-tab-group class="mat-tab-fill-height">
+      <mat-tab label="Console">
+        <app-console [featureRunnerResponse]="featureRunnerResponse">
+        </app-console>
+      </mat-tab>
+      <mat-tab label="Rapport HTML" *ngIf="featureRunnerResponse">
+        <app-html-report [featureRunnerResponse]="featureRunnerResponse">
+        </app-html-report>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-grid-tile>
+</mat-grid-list>
 
-<h1>Console</h1>
 
-<app-console [featureRunnerResponse]="featureRunnerResponse">
-</app-console>
-
-<h1>Rapport HTML</h1>
-<app-html-report [featureRunnerResponse]="featureRunnerResponse">
-</app-html-report>
 
 

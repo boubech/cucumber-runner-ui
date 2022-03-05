@@ -21,9 +21,12 @@ export class ConsoleUiComponent implements AfterViewChecked {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['featureRunnerResponse']!.currentValue.id != 0) {
-      console.log(changes['featureRunnerResponse']!.currentValue)
+
+    if (changes['featureRunnerResponse'] &&
+      changes['featureRunnerResponse']!.currentValue &&
+      changes['featureRunnerResponse']!.currentValue.id != 0) {
       this.lines = this.lines.concat(changes['featureRunnerResponse']!.currentValue.reportPretty);
+      console.log(this.autoScroll)
       this.scrollToBottom();
     }
   }
@@ -31,11 +34,11 @@ export class ConsoleUiComponent implements AfterViewChecked {
   scrollToBottom() {
     if (this.autoScroll) {
       this.myDiv!.nativeElement.scrollTop = this.myDiv!.nativeElement.scrollHeight;
-      console.log(this.myDiv!.nativeElement.scrollHeight)
     }
   }
 
   enableAutoScroll() {
+    console.log("autoscroll",this.autoScroll)
     this.autoScroll = this.myDiv!.nativeElement.scrollTop == this.myDiv!.nativeElement.scrollHeight;
   }
 }

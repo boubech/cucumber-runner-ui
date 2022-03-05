@@ -4,19 +4,24 @@ import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule} from "@angular/forms";
 import { FileExplorerComponent } from './file-explorer/file-explorer.component';
 import { FileItemComponent } from './file-explorer/file-item/file-item.component';
+import {MatIconModule} from "@angular/material/icon";
+import { FeatureEditorComponent } from './feature-editor/feature-editor.component';
 
 @NgModule({
   declarations: [
     FileExplorerComponent,
-    FileItemComponent
+    FileItemComponent,
+    FeatureEditorComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    MatIconModule
   ],
   exports: [
-    FileExplorerComponent
+    FileExplorerComponent,
+    FeatureEditorComponent
   ],
   providers: []
 })

@@ -1,3 +1,12 @@
-<div>
-  <app-file-item *ngFor="let file of files" [file]="file"></app-file-item>
-</div>
+<section>
+  <header>
+    Workspace
+  </header>
+  <div>
+    <app-file-item *ngFor="let file of files" [file]="file"></app-file-item>
+  </div>
+  <footer>
+    <input #fileInput hidden="true" type="file" name="flue" accept="*/*" (change)="onFileSelected($event)"/>
+    <mat-icon (click)="fileInput.click()">cloud_upload</mat-icon>
+  </footer>
+</section>

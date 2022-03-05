@@ -1,0 +1,95 @@
+
+section {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+header {
+  border-bottom : 1px solid black;
+  height: 2rem;
+  vertical-align: middle;
+  line-height: 2rem;
+  text-indent: 1rem;
+}
+
+header span {
+  height: 2rem;
+  float: left;
+  display: block;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  overflow: auto;
+  padding: 1rem;
+  background-color: #393a34;
+  color: #dddddd;
+
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+footer {
+  height: 2rem;
+  border-top : 1px solid black;
+}
+
+mat-icon {
+  display: block;
+  margin-top: 3px;
+}
+
+mat-icon[name=start]{
+  color: green;
+}
+
+mat-icon[name=stop]{
+  color: darkred;
+}
+
+.line {
+  width: 100%;
+  cursor: text;
+}
+.blank {
+  flex: 1;
+  cursor: text;
+}
+
+.line input {
+  width: 90%;
+  background-color: transparent;
+  color: white;
+  border: none;
+}
+.line input:focus {
+  border: none;
+  outline: none;
+}
+
+
+.editor {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  overflow-y: auto;
+  padding-left: 48px;
+  counter-reset: line;
+}
+
+.editor div {
+  display: block;
+  position: relative;
+  white-space: pre-wrap;
+}
+
+.editor div::before {
+  content: counter(line);
+  counter-increment: line;
+  position: absolute;
+  right: calc(100% + 16px);
+  opacity: 0.5;
+}
+
