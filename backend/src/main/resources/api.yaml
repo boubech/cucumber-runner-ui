@@ -7,6 +7,28 @@ servers:
   - url: /api/v1
     description: Optional server description, e.g. Main (production) server
 paths:
+  /directory:
+    post:
+      operationId: makeDirectory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                directory:
+                  type: string
+                  format: string
+              required:
+                - directory
+      responses:
+        '200': # status code
+          description: A JSON array of user names
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
   /files:
     get:
       operationId: getFiles
@@ -62,7 +84,7 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: pong
+                example: filename
   /glues:
     get:
       operationId: getGlues

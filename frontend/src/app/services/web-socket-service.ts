@@ -40,8 +40,9 @@ export class WebSocketService {
   }
 
   private connect = () => {
+    const brokerURL: string = environment.webSocketURL == undefined ? this.getFromRelativeUrl() : environment.webSocketURL;
     this.stompService.stompClient.configure({
-      brokerURL: environment.webSocketURL,
+      brokerURL: brokerURL,
       heartbeatIncoming: 0,
       heartbeatOutgoing: 20000,
       reconnectDelay: 5000
@@ -49,6 +50,19 @@ export class WebSocketService {
     this.stompService.stompClient.onConnect = this.onSocketConnect;
     this.stompService.stompClient.onStompError = this.onSocketError;
     this.stompService.stompClient.activate();
+  }
+
+  private getFromRelativeUrl(): string {
+    var loc = window.location, new_uri;
+    if (loc.protocol === "https:") {
+      new_uri = "wss:";
+    } else {
+      new_uri = "ws:";
+    }
+    new_uri += "//" + loc.host;
+    new_uri += loc.pathname + "/ws";
+    console.log(new_uri)
+    return new_uri;
   }
 
   private onSocketConnect = () => {

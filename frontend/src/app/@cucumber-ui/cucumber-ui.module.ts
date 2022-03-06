@@ -15,13 +15,15 @@ import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatMenuModule} from "@angular/material/menu";
+import { DialogCreateDirectoryComponent } from './file-explorer/file-item/dialog-create-directory/dialog-create-directory.component';
 
 @NgModule({
   declarations: [
     FileExplorerComponent,
     FileItemComponent,
     FeatureEditorComponent,
-    RunnerSettingsComponent
+    RunnerSettingsComponent,
+    DialogCreateDirectoryComponent
   ],
   imports: [
     BrowserModule,

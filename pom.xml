@@ -12,6 +12,7 @@
         <module>backend</module>
         <module>frontend</module>
         <module>example</module>
+        <module>application</module>
     </modules>
 
     <properties>

@@ -6,7 +6,7 @@ section {
 }
 
 header {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid white;
   height: 2rem;
   vertical-align: middle;
   line-height: 2rem;
@@ -21,7 +21,7 @@ div {
 
 footer {
   height: 2rem;
-  border-top: 1px solid black;
+  border-top: 1px solid white;
   text-indent: 1rem;
 }
 

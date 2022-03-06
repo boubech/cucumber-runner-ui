@@ -1,6 +1,7 @@
 
 .main {
-  height: 1vh;
+  height: 100vh;
+  display: block;
 }
 
 .toolbar {

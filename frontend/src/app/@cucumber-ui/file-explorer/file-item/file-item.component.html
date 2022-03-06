@@ -7,11 +7,11 @@
       <span (click)="select()" [matMenuTriggerFor]="fileMenu">{{file!.name}}</span>
     </div>
     <div class="directory" *ngIf="file!.isDirectory">
-      <mat-icon class="open" aria-hidden="false" aria-label="Open" *ngIf="file!.isDirectory && hideDirectoryContent"
+      <mat-icon class="open" aria-hidden="false" aria-label="Open" *ngIf="file!.isDirectory && !file!.showContent"
                 (click)="showOrHideDirectoryContent()">chevron_right
       </mat-icon>
-      <mat-icon class="close" aria-hidden="false" aria-label="Close" *ngIf="file!.isDirectory && !hideDirectoryContent"
-                (click)="showOrHideDirectoryContent()">expand_less
+      <mat-icon class="close" aria-hidden="false" aria-label="Close" *ngIf="file!.isDirectory && file!.showContent"
+                (click)="showOrHideDirectoryContent()">expand_more
       </mat-icon>
       <mat-icon [matMenuTriggerFor]="directoryMenu" aria-hidden="false" aria-label="Directory" *ngIf="file!.isDirectory"
                 (click)="select()">folder
@@ -20,12 +20,12 @@
     </div>
   </div>
   <div>
-    <div class="directory-content" *ngIf="file!.isDirectory && !hideDirectoryContent">
+    <div class="directory-content" *ngIf="file!.isDirectory && file!.showContent">
       <app-file-item class="subfile" *ngFor="let subfile of file!.files"
                      [file]="subfile"
-                     (onSelected)="onSelectItem($event)"
-                     (onUnselected)="onUnselectItem($event)"
-                     (onDelete)="delete($event)"></app-file-item>
+                     (onDelete)="delete($event)"
+                     (onUpload)="onUploadEvent($event)"
+      ></app-file-item>
     </div>
   </div>
 </div>
@@ -35,20 +35,25 @@
     <mat-icon>download</mat-icon>
     <span>Download</span>
   </button>
-  <button mat-menu-item (click)="delete(file!)">
+  <button *ngIf="file!.isRoot == false" mat-menu-item (click)="delete(file!)">
     <mat-icon>delete</mat-icon>
     <span>Delete</span>
   </button>
 </mat-menu>
 
 <mat-menu #directoryMenu="matMenu">
-  <button disabled mat-menu-item>
+  <button mat-menu-item (click)="fileInput.click()">
     <mat-icon>upload</mat-icon>
     <span>Upload</span>
   </button>
-  <button mat-menu-item (click)="delete(file!)">
+  <button mat-menu-item (click)="makeDirectory()">
+    <mat-icon>upload</mat-icon>
+    <span>Create directory</span>
+  </button>
+  <button *ngIf="file!.isRoot == false" mat-menu-item (click)="delete(file!)">
     <mat-icon>delete</mat-icon>
     <span>Delete</span>
   </button>
 </mat-menu>
+<input #fileInput hidden="true" type="file" name="flue" accept="*/*" (change)="onFileSelected($event)"/>
 

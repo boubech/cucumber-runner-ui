@@ -13,6 +13,10 @@ body {
   flex: 1 1 100%;
 }
 
+app-root {
+  height: 100%;
+  display: block;
+}
 
 .ace_editor.ace_autocomplete,
 .ace_autocomplete {
@@ -36,3 +40,8 @@ body {
 }
 
 
+
+router-outlet + * {
+  display: block;
+  height: 100%;
+}

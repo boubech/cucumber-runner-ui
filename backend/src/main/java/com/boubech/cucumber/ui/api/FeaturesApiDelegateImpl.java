@@ -1,5 +1,6 @@
 package com.boubech.cucumber.ui.api;
 
+import com.boubech.cucumber.ui.converters.TestExecutionContextToFeatureRunnerResponse;
 import com.boubech.cucumber.ui.model.FeatureRunnerOptionRequest;
 import com.boubech.cucumber.ui.model.FeatureRunnerRequest;
 import com.boubech.cucumber.ui.model.FeatureRunnerResponse;
@@ -24,11 +25,14 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
 
     private final WorkspaceService workspaceService;
     private final TestRunnerCommandLine testRunnerService;
+    private final TestExecutionContextToFeatureRunnerResponse convertToFeatureRunnerResponse;
 
     public FeaturesApiDelegateImpl(WorkspaceService workspaceService,
-                                   TestRunnerCommandLine testRunnerService) {
+                                   TestRunnerCommandLine testRunnerService,
+                                   TestExecutionContextToFeatureRunnerResponse convertToFeatureRunnerResponse) {
         this.workspaceService = workspaceService;
         this.testRunnerService = testRunnerService;
+        this.convertToFeatureRunnerResponse = convertToFeatureRunnerResponse;
     }
 
     @Override
@@ -39,9 +43,9 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
             if (testExecutionContext.getState().equals(TestExecutionContext.State.ERROR)) {
                 throw new IllegalStateException("Error to run test" + String.join("\n", testExecutionContext.getLog()));
             } else if (testExecutionContext.getState().equals(TestExecutionContext.State.FAILED)) {
-                return new ResponseEntity<>(convertToFeatureRunnerResponse(testExecutionContext), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(convertToFeatureRunnerResponse.apply(testExecutionContext), HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>(convertToFeatureRunnerResponse(testExecutionContext), HttpStatus.OK);
+                return new ResponseEntity<>(convertToFeatureRunnerResponse.apply(testExecutionContext), HttpStatus.OK);
             }
         } catch (IOException | InterruptedException | IllegalStateException e) {
             e.printStackTrace();
@@ -78,26 +82,6 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
         } while (testExecutionContext.getState().equals(TestExecutionContext.State.RUNNING));
     }
 
-    private FeatureRunnerResponse convertToFeatureRunnerResponse(TestExecutionContext testExecutionContext) throws IOException {
-        FeatureRunnerResponse featureRunnerResponse = new FeatureRunnerResponse();
-        featureRunnerResponse.setId(testExecutionContext.getIdentifier());
-        featureRunnerResponse.reportHtmlId(testExecutionContext.getHtmlReport().exists() ? testExecutionContext.getIdentifier() : null);
-        featureRunnerResponse.reportJson(testExecutionContext.getJsonReport().exists() ? Files.readAllLines(testExecutionContext.getJsonReport().toPath()) : null);
-        featureRunnerResponse.reportPretty(testExecutionContext.getPrettyReport().exists() ? Files.readAllLines(testExecutionContext.getPrettyReport().toPath()) : testExecutionContext.getLog());
-        switch (testExecutionContext.getState()) {
-            case ERROR:
-                featureRunnerResponse.setState(ERROR);
-                break;
-            case SUCCESS:
-                featureRunnerResponse.setState(SUCCESS);
-                break;
-            case FAILED:
-                featureRunnerResponse.setState(FAILURE);
-                break;
-            default:
-                break;
-        }
-        return featureRunnerResponse;
-    }
+
 
 }

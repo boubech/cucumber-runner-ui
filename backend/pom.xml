@@ -13,11 +13,14 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <jobrunr.version>3.1.1</jobrunr.version>
         <awaitility.version>4.0.3</awaitility.version>
         <openapi-generator.version>5.4.0</openapi-generator.version>
-        <jackson-databind.version>0.2.2</jackson-databind.version>
         <springfox.version>2.9.2</springfox.version>
+        <jackson.version>2.13.2</jackson.version>
+        <jackson-databind.version>0.2.2</jackson-databind.version>
     </properties>
 
     <dependencyManagement>
@@ -58,14 +61,19 @@
             <artifactId>reflections</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.6</version>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator</artifactId>
             <version>${openapi-generator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>

@@ -26,7 +26,7 @@ public class DynamiqueClassLoadService {
 
     public URLClassLoader get() {
         List<File> files = this.workspaceService.listFiles();
-        URL[] url = files.stream()
+        URL[] urls = files.stream()
                 .map(File::toURI)
                 .map(uri -> {
                     try {
@@ -37,7 +37,7 @@ public class DynamiqueClassLoadService {
                 })
                 .collect(Collectors.toList())
                 .toArray(new URL[0]);
-        return new URLClassLoader(url);
+        return new URLClassLoader(urls);
     }
 
     public List<Class<?>> getClasses() throws IOException {

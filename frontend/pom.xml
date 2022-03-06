@@ -3,10 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <artifactId>frontend</artifactId>
-  <groupId>com.boubech.cucumber.ui</groupId>
-  <version>1.0.0-SNAPSHOT</version>
+  <parent>
+    <artifactId>runner</artifactId>
+    <groupId>com.boubech.cucumber.ui</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
 
+  <artifactId>frontend</artifactId>
 
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
@@ -45,6 +48,25 @@
             </goals>
             <configuration>
               <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>distribution-by-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
             </configuration>
           </execution>
         </executions>

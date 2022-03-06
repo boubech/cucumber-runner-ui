@@ -41,6 +41,7 @@ export class CucumberUiComponent implements OnInit {
   }
 
   refresh() {
+    console.log("refresh")
     this.refreshGlues();
     this.refreshWorkspace();
   }

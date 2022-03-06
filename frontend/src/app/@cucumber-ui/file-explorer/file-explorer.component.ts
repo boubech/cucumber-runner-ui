@@ -10,6 +10,8 @@ export interface FileExplorerItem {
   path: string;
   selected: boolean;
   files?: FileExplorerItem[];
+  isRoot: boolean;
+  showContent: boolean;
 }
 
 @Component({
@@ -20,13 +22,10 @@ export interface FileExplorerItem {
 export class FileExplorerComponent {
 
   @Input() files: FileResponse[] | undefined;
-  fileExplorerItems: FileExplorerItem[] = [];
-
-  @Output() fileUploaded = new EventEmitter<File>();
+  @Output() fileUploaded = new EventEmitter<FileExplorerItem>();
   @Output() filesDeleted = new EventEmitter<FileToDeleteRequest[]>();
-  fileToUpload: File | undefined;
 
-  hasItemSelected: boolean = false;
+  fileExplorerItems: FileExplorerItem[] = [];
 
   constructor(private _workspaceService: WorkspaceService) {
   }
@@ -57,37 +56,12 @@ export class FileExplorerComponent {
 
   private removeNoExisting(existingItems: FileExplorerItem[], updatedItems: FileExplorerItem[]) {
     let toRemove: FileExplorerItem[] = [];
-    existingItems.forEach((existing, index) => {
+    existingItems.forEach(existing => {
       if (!updatedItems.find(i => i.path == existing.path)) {
         toRemove.push(existing);
       }
     });
     toRemove.forEach(i => existingItems.splice(existingItems.indexOf(i), 1))
-  }
-
-  onFileSelected(event: any): void {
-    this.fileToUpload = event.target.files[0];
-    this.uploadFile();
-  }
-
-  uploadFile(): void {
-    this._workspaceService.uploadFile(this.fileToUpload!).subscribe(() => {
-      this.fileUploaded.emit(this.fileToUpload);
-    });
-  }
-
-  deleteFiles(): void {
-    let filesToDeletes = this.getFileSelected(this.fileExplorerItems).map(file => {
-      return {path: file.path};
-    });
-    this._workspaceService.deleteFiles(filesToDeletes).subscribe(() => {
-      this._workspaceService.getFiles().subscribe(files => {
-        this.files?.splice(0, this.files.length);
-        files[0].files!.forEach(file => this.files!.push(file))
-        this.updateAllItems();
-        this.filesDeleted.emit(filesToDeletes)
-      });
-    });
   }
 
   deleteFile(file: FileExplorerItem): void {
@@ -103,26 +77,16 @@ export class FileExplorerComponent {
     });
   }
 
-  getFileSelected(files: FileExplorerItem[]): FileExplorerItem[] {
-    let filesSelected = files.filter(file => file.selected);
-
-    files.filter(file => !file.selected && file.isDirectory)
-      .map(directory => this.getFileSelected(directory.files!))
-      .forEach(subfiles => subfiles.forEach(file => filesSelected.push(file)));
-
-    return filesSelected;
-
-  }
-
   convert(files: FileResponse[], parent: FileExplorerItem | undefined): FileExplorerItem[] {
     return files ? files.map(file => {
-
       let item: FileExplorerItem = {
         parent: parent,
         name: file.name,
         path: file.path,
         isDirectory: file.isDirectory,
-        selected: false
+        selected: false,
+        isRoot: parent == undefined,
+        showContent: parent == undefined
       };
       if (item.isDirectory) {
         item.files = this.convert(file.files!, item);
@@ -131,13 +95,8 @@ export class FileExplorerComponent {
     }) : [];
   }
 
-
-  onSelectItem(fileExplorerItemSelected: FileExplorerItem): void {
-    this.fileExplorerItems?.filter(file => file.path != fileExplorerItemSelected.path).forEach(file => file.selected = false);
-    this.hasItemSelected = true;
-  }
-
-  onUnselectItem(fileExplorerItemSelected: FileExplorerItem): void {
-    this.hasItemSelected = false;
+  uploadFile(event: FileExplorerItem) {
+    console.log(event)
+    this.fileUploaded.emit(event);
   }
 }

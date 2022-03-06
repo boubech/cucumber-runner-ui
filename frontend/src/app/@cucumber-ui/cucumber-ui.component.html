@@ -1,6 +1,6 @@
-<mat-grid-list cols="4" class="main" rowHeight="30vh">
+<mat-grid-list cols="4" class="main" rowHeight="33.25%">
   <mat-grid-tile colspan="1" class="explorer" rowspan="2">
-    <app-file-explorer [files]="files[0].files"
+    <app-file-explorer [files]="files"
                        (fileUploaded)="refresh()"
                        (filesDeleted)="refresh()"
                        *ngIf="files"
@@ -19,8 +19,16 @@
       Loading editor...
     </span>
   </mat-grid-tile>
-  <mat-grid-tile colspan="4" class="bottom-bar">
+  <mat-grid-tile  class="bottom-bar" colspan="4" rowspan="1">
     <mat-tab-group class="mat-tab-fill-height">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">notes</mat-icon>
+          <span class="tab-label">Console</span>
+        </ng-template>
+        <app-console>
+        </app-console>
+      </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">settings</mat-icon>
@@ -49,14 +57,6 @@
         </ng-template>
         <app-glue-dictionary [glues]="glues">
         </app-glue-dictionary>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">notes</mat-icon>
-          <span class="tab-label">Console</span>
-        </ng-template>
-        <app-console>
-        </app-console>
       </mat-tab>
       <mat-tab *ngIf="htmlReportUrl">
         <ng-template mat-tab-label>

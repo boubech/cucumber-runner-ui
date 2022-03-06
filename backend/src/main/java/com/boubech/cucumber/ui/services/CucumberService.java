@@ -1,14 +1,8 @@
 package com.boubech.cucumber.ui.services;
 
-import com.github.jknack.handlebars.internal.lang3.tuple.Pair;
-import lombok.Builder;
-import lombok.Getter;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -26,15 +20,10 @@ public class CucumberService {
             "net.jodah",
             "org.apiguardian",
             "org.picocontainer",
+            "org.opentest4j",
+            "org.hamcrest",
             "org.junit"
     };
-
-    private static final Set<Class<Annotation>> CUCUMBER_ANNOTATION = new Reflections("io.cucumber.java", new SubTypesScanner(false))
-            .getSubTypesOf(Object.class)
-            .stream()
-            .filter(Class::isAnnotation)
-            .map(annotation -> ((Class<Annotation>) annotation))
-            .collect(Collectors.toSet());
 
     public CucumberService(DynamiqueClassLoadService dynamiqueClassLoadService) {
         this.dynamiqueClassLoadService = dynamiqueClassLoadService;
@@ -66,9 +55,8 @@ public class CucumberService {
     private List<Glue> getCucumberStep(Class<?> aClass) {
         try {
             return Arrays.stream(aClass.getMethods())
-                    .map(this::getStepValue)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .map(method -> this.getStepValue(aClass, method))
+                    .flatMap(Collection::stream)
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             return Collections.emptyList();
@@ -80,28 +68,32 @@ public class CucumberService {
         return this.dynamiqueClassLoadService.getClasses()
                 .stream()
                 .filter(this::excludeThirdLib)
-                .filter(clazz -> Arrays.stream(clazz.getMethods()).anyMatch(method -> getStepValue(method).isPresent()))
+                .filter(clazz -> Arrays.stream(clazz.getMethods()).anyMatch(method -> !getStepValue(clazz, method).isEmpty()))
                 .collect(Collectors.toList());
     }
 
-    private Optional<Glue> getStepValue(Method method) {
-        Optional<Class<Annotation>> optionalAnnotation = CUCUMBER_ANNOTATION.stream()
-                .filter(method::isAnnotationPresent)
-                .findFirst();
-        return optionalAnnotation.map(annotation -> {
-            try {
-                Method getter = method.getAnnotation(annotation).getClass().getMethod("value");
-                return Glue.builder()
-                        .clazz(method.getDeclaringClass())
-                        .method(method)
-                        .value(getter.invoke(method.getAnnotation(annotation)).toString())
-                        .annotation(annotation)
-                        .build();
-            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
+    private List<Glue> getStepValue(Class clazz, Method method) {
+        if (method.getAnnotations() == null || method.getAnnotations().length == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(method.getAnnotations())
+                .filter(annotation ->
+                        annotation.toString().startsWith("@io.cucumber.java"))
+                .map(annotation -> {
+                    try {
+                        Method getter = method.getAnnotation(annotation.annotationType()).getClass().getMethod("value");
+                        return Glue.builder()
+                                .clazz(method.getDeclaringClass())
+                                .method(method)
+                                .value(getter.invoke(method.getAnnotation(annotation.annotationType())).toString())
+                                .annotation(annotation.annotationType())
+                                .build();
+                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
 }

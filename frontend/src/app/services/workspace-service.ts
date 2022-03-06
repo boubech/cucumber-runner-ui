@@ -11,12 +11,17 @@ export class WorkspaceService {
   constructor(private _apiService: ApiService, private _apiConfiguration: ApiConfiguration) {
   }
 
-  uploadFile(file: File): Observable<string> {
+  makeDirectory(directoryPath: string): Observable<string> {
+    console.log(directoryPath)
+    return this._apiService.makeDirectory({body: {directory: directoryPath}});
+  }
+
+  uploadFile(file: File, directory: string): Observable<string> {
     let filename = file.name;
     let blob = new Blob([file], {type: file.type})
     return this._apiService.uploadFile({
       body: {
-        'filename': filename,
+        'filename': directory + '/' + filename,
         'file': blob
       }
     });

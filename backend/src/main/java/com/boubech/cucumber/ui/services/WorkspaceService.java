@@ -33,15 +33,31 @@ public class WorkspaceService {
     }
 
     public void add(String filename, MultipartFile multipartFile) throws IOException {
-        File file = new File(workspaceFolder.getAbsolutePath() + File.separator + filename);
+        File file = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + filename);
+        if (!fileIsInWorkspace(file)) {
+            throw new IllegalStateException("Unable to create file " + file.getAbsolutePath() + ", file is located outside of workspace");
+        }
         try (OutputStream os = new FileOutputStream(file)) {
             os.write(multipartFile.getBytes());
         }
     }
 
+    public void makeDirectory(String directory) {
+        File file = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + directory);
+        if (!fileIsInWorkspace(file)) {
+            throw new IllegalStateException("Unable to create directory " + file.getAbsolutePath() + ", directory is located outside of workspace");
+        } else if (!file.mkdirs()) {
+            throw new IllegalStateException("Unable to create directory " + file.getAbsolutePath());
+        }
+    }
+
+    private boolean fileIsInWorkspace(File file) {
+        return file.getAbsoluteFile().toPath().normalize().startsWith(workspaceFolder.getAbsoluteFile().toPath().normalize());
+    }
+
     public void delete(String filename) {
         File file = new File(filename);
-        if (!file.getAbsolutePath().startsWith(this.workspaceFolder.getAbsolutePath())) {
+        if (!fileIsInWorkspace(file)) {
             throw new IllegalStateException("Unable to delete file " + file.getAbsolutePath() + ", it's located outside of workspace");
         } else if (file.isFile() && !file.delete()) {
             throw new IllegalStateException("Unable to delete file " + file.getAbsolutePath());

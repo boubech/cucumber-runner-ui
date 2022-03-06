@@ -1,30 +1,30 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FileExplorerItem} from "../file-explorer.component";
+import {WorkspaceService} from "../../../services/workspace-service";
+import {DialogCreateDirectoryComponent} from "./dialog-create-directory/dialog-create-directory.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-file-item',
   templateUrl: './file-item.component.html',
   styleUrls: ['./file-item.component.css']
 })
-export class FileItemComponent implements OnInit {
+export class FileItemComponent {
 
   @Input() file: FileExplorerItem | undefined;
   @Output() onSelected = new EventEmitter<FileExplorerItem>();
   @Output() onUnselected = new EventEmitter<FileExplorerItem>();
   @Output() onDelete = new EventEmitter<FileExplorerItem>();
+  @Output() onUpload = new EventEmitter<FileExplorerItem>();
 
-  hideDirectoryContent: boolean = true;
   isFocused: boolean = false;
-  isSelected: boolean = false;
+  fileToUpload: File | undefined;
 
-  constructor() {
-  }
-
-  ngOnInit(): void {
+  constructor(private _workspaceService: WorkspaceService, public dialog: MatDialog) {
   }
 
   showOrHideDirectoryContent() {
-    this.hideDirectoryContent = !this.hideDirectoryContent;
+    this.file!.showContent = !this.file!.showContent;
   }
 
   focusChange(isFocused: boolean) {
@@ -46,19 +46,6 @@ export class FileItemComponent implements OnInit {
     }
   }
 
-  onSelectItem(fileExplorerItemSelected: FileExplorerItem) : void {
-    this.file!.selected = false;
-    this.file?.files?.filter(file => file.path != fileExplorerItemSelected.path)
-                     .forEach(file => file.selected = false);
-    this.onSelected.emit(fileExplorerItemSelected);
-  }
-
-
-
-  onUnselectItem(fileExplorerItemSelected: FileExplorerItem) : void {
-    this.onUnselected.emit(fileExplorerItemSelected);
-  }
-
   recursiveSelect(file: FileExplorerItem, selected: boolean): void {
     file.selected = selected;
     let self = this;
@@ -70,4 +57,31 @@ export class FileItemComponent implements OnInit {
   delete(file: FileExplorerItem) {
     this.onDelete.emit(file)
   }
+
+  onFileSelected(event: any) {
+    this.fileToUpload = event!.target!.files[0]!;
+    this._workspaceService.uploadFile(this.fileToUpload!, this.file?.path!).subscribe(() => {
+      this.onUploadEvent(this.file!);
+    });
+  }
+
+  onUploadEvent(file: FileExplorerItem): void {
+    this.onUpload.emit(file);
+  }
+
+  makeDirectory() {
+
+    const dialogRef = this.dialog.open(DialogCreateDirectoryComponent, {
+      width: '250px',
+      data: {directory: 'sub-directory'},
+    });
+
+    dialogRef.afterClosed().subscribe((directoryName: string) => {
+      this._workspaceService.makeDirectory(this.file?.path + '/' + directoryName).subscribe(result => {
+        this.onUpload.emit(this.file)
+      });
+    });
+
+  }
 }
+
