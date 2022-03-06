@@ -16,7 +16,7 @@ public class HtmlReportsApiDelegateImpl implements HtmlReportsApiDelegate {
     }
 
 
-    public ResponseEntity<String> getHtmlReport(Integer reportId) {
+    public ResponseEntity<String> getHtmlReport(String reportId) {
         try {
             return this.workspaceService.findTestExecutionContextById(reportId)
                     .map(TestExecutionContext::getHtmlReportAsString)

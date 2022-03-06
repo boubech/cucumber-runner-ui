@@ -3,6 +3,7 @@ import {ApiConfiguration} from "../api/api-configuration";
 import {Observable} from "rxjs";
 import {ApiService} from "../api/services/api.service";
 import {FileResponse} from "../api/models/file-response";
+import {FileToDeleteRequest, GlueResponse} from "../api/models";
 
 @Injectable({providedIn: 'root'})
 export class WorkspaceService {
@@ -25,7 +26,12 @@ export class WorkspaceService {
     return this._apiService.getFiles();
   }
 
-  getGlues(): Observable<Array<string>> {
+  deleteFiles(files: FileToDeleteRequest[]): Observable<string> {
+    return this._apiService.deleteFile({body: files});
+  }
+
+  getGlues(): Observable<Array<GlueResponse>> {
     return this._apiService.getGlues();
   }
+
 }

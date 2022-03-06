@@ -2,6 +2,7 @@ package com.boubech.cucumber.ui.api;
 
 
 import com.boubech.cucumber.ui.model.FileResponse;
+import com.boubech.cucumber.ui.model.FileToDeleteRequest;
 import com.boubech.cucumber.ui.services.WorkspaceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,12 @@ public class FileApiDelegateImpl implements FilesApiDelegate {
                 .sorted((f1, f2) -> String.CASE_INSENSITIVE_ORDER.compare(f1.getName(), f2.getName()))
                 .collect(Collectors.toList()) : null);
         return fileResponse;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteFile(List<FileToDeleteRequest> fileToDeleteRequest) {
+        fileToDeleteRequest.stream().map(FileToDeleteRequest::getPath).forEach(workspaceService::delete);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

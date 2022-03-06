@@ -1,8 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .mat-tab-group.mat-tab-fill-height .mat-tab-body-wrapper {
   flex: 1 1 100%;
 }
+
+
+.ace_editor.ace_autocomplete,
+.ace_autocomplete {
+  width: 500px;
+}
+
+.passed {
+  color: green;
+}
+.failed {
+  color: orange;
+}
+.undefined {
+  color: red;
+}
+.skipped {
+  text-decoration: line-through;
+  text-decoration-color: grey;
+  text-decoration-thickness: 1px;
+  color: grey;
+}
+
+

@@ -14,10 +14,17 @@ import {ConsoleUiComponent} from "./@cucumber-ui/console-ui/console-ui.component
 import {SafeResourceUrlPipe} from "./@cucumber-ui/pipe/safe-resource-url.pipe";
 import {CucumberUiModule} from "./@cucumber-ui/cucumber-ui.module";
 import {HtmlReportComponent} from "./@cucumber-ui/html-report/html-report.component";
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatIconModule} from "@angular/material/icon";
 import {MatGridListModule} from "@angular/material/grid-list";
 import {MatTabsModule} from "@angular/material/tabs";
+import {GlueDictionary} from './@cucumber-ui/glue-dictionary/glue-dictionary.component';
+import {RxStompService} from "@stomp/ng2-stompjs";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatTableModule} from "@angular/material/table";
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatInputModule} from "@angular/material/input";
+import {MatButtonModule} from "@angular/material/button";
 
 @NgModule({
   declarations: [
@@ -25,24 +32,33 @@ import {MatTabsModule} from "@angular/material/tabs";
     CucumberUiComponent,
     ConsoleUiComponent,
     HtmlReportComponent,
+    GlueDictionary,
     AnsiToHtml,
     SafeHtml,
     SpaceToHtml,
     SafeResourceUrlPipe
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        HttpClientModule,
-        FormsModule,
-        CommonModule,
-        CucumberUiModule,
-        BrowserAnimationsModule,
-        MatIconModule,
-        MatGridListModule,
-        MatTabsModule,
-    ],
-  providers: [],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    FormsModule,
+    CommonModule,
+    CucumberUiModule,
+    BrowserAnimationsModule,
+    MatIconModule,
+    MatGridListModule,
+    MatTabsModule,
+    MatTableModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatInputModule
+  ],
+  providers: [
+    RxStompService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

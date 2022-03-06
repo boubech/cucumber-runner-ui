@@ -1,44 +1,49 @@
-import {AfterViewChecked, Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {FeatureRunnerResponse} from "../../api/models/feature-runner-response";
+import {Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {Test} from 'src/app/services/test-runner-service';
+import {LogService} from "../../services/log-service";
 
 @Component({
   selector: 'app-console',
   templateUrl: './console-ui.component.html',
   styleUrls: ['./console-ui.component.css']
 })
-export class ConsoleUiComponent implements AfterViewChecked {
+export class ConsoleUiComponent implements OnInit {
 
-  @Input() featureRunnerResponse: FeatureRunnerResponse | undefined;
+  //@Input() test: Test | undefined;
 
   lines: string[] = [];
 
   autoScroll: boolean = true;
 
-  @ViewChild('myDiv') myDiv: ElementRef | undefined;
+  @ViewChild('console') console: ElementRef | undefined;
 
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
+  constructor(private _logService: LogService) {
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-
-    if (changes['featureRunnerResponse'] &&
-      changes['featureRunnerResponse']!.currentValue &&
-      changes['featureRunnerResponse']!.currentValue.id != 0) {
-      this.lines = this.lines.concat(changes['featureRunnerResponse']!.currentValue.reportPretty);
-      console.log(this.autoScroll)
+  ngOnInit(): void {
+    this._logService.getObservable()?.subscribe(response => {
+      this.lines.push(response.message.message);
+      console.log(response.message)
       this.scrollToBottom();
+    })
+  }
+  /*
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['test'] &&
+      changes['test']!.currentValue &&
+      changes['test']!.currentValue.id != 0) {
+      //this.lines = this.lines.concat(changes['test']!.currentValue.reportPretty);
+      //this.scrollToBottom();
     }
   }
-
+  */
   scrollToBottom() {
-    if (this.autoScroll) {
-      this.myDiv!.nativeElement.scrollTop = this.myDiv!.nativeElement.scrollHeight;
+    if (this.console) {
+      this.console.nativeElement.scrollTop = this.console.nativeElement.scrollTopMax;
     }
   }
 
   enableAutoScroll() {
-    console.log("autoscroll",this.autoScroll)
-    this.autoScroll = this.myDiv!.nativeElement.scrollTop == this.myDiv!.nativeElement.scrollHeight;
+    //this.autoScroll = this.console!.nativeElement.scrollTop == this.console!.nativeElement.scrollTopMax;
   }
 }

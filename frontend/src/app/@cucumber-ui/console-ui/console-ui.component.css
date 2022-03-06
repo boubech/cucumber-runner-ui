@@ -16,8 +16,9 @@
 .terminal pre {
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
   color: white;
-  padding: 0 2rem 1rem 2rem;
   margin: 0;
-  height: 1pc;
+  min-height: 1pc;
   white-space: normal;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }

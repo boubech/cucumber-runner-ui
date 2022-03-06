@@ -1,6 +1,6 @@
 package com.boubech.cucumber.ui.services;
 
-import com.boubech.cucumber.ui.model.FileResponse;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,16 +8,25 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class WorkspaceService {
 
-    private static final File workspaceFolder = new File("./.workspace");
+    private final File workspaceFolder;
     private final List<TestExecutionContext> testExecutionContexts = new ArrayList<>();
 
+    public WorkspaceService(File workspaceFolder) {
+        this.workspaceFolder = workspaceFolder;
+        if (!workspaceFolder.exists() && !workspaceFolder.mkdirs()) {
+            throw new IllegalStateException("Unable to create directory " + workspaceFolder.getAbsolutePath());
+        }
+    }
+
     public WorkspaceService() {
+        this.workspaceFolder = new File("./.workspace");
         if (!workspaceFolder.exists() && !workspaceFolder.mkdirs()) {
             throw new IllegalStateException("Unable to create directory " + workspaceFolder.getAbsolutePath());
         }
@@ -27,6 +36,21 @@ public class WorkspaceService {
         File file = new File(workspaceFolder.getAbsolutePath() + File.separator + filename);
         try (OutputStream os = new FileOutputStream(file)) {
             os.write(multipartFile.getBytes());
+        }
+    }
+
+    public void delete(String filename) {
+        File file = new File(filename);
+        if (!file.getAbsolutePath().startsWith(this.workspaceFolder.getAbsolutePath())) {
+            throw new IllegalStateException("Unable to delete file " + file.getAbsolutePath() + ", it's located outside of workspace");
+        } else if (file.isFile() && !file.delete()) {
+            throw new IllegalStateException("Unable to delete file " + file.getAbsolutePath());
+        } else if (file.isDirectory()) {
+            try {
+                FileUtils.deleteDirectory(file);
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to delete directory " + file.getAbsolutePath(), e);
+            }
         }
     }
 
@@ -40,34 +64,31 @@ public class WorkspaceService {
     }
 
 
-    public TestExecutionContext createNewTestExecutionContext() {
-        int i = 0;
-        Optional<TestExecutionContext> existingContext;
-        File directory;
-        do {
-            existingContext = this.findTestExecutionContextById(i);
-            directory = getTextExecutionDirectoryFromIdentifier(i);
-            i = i + 1;
-        } while (directory.exists() || existingContext.isPresent());
+    public TestExecutionContext createNewTestExecutionContext(Map<String, String> properties, Map<String, String> environments) {
+
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss");
+        String id = ZonedDateTime.now().format(dateFormat);
+        File directory = getTextExecutionDirectoryFromIdentifier(id);
 
         if (!directory.mkdirs()) {
             throw new IllegalStateException("Unable to create directory : " + directory.getAbsolutePath());
         }
 
-        TestExecutionContext testExecutionContext = TestExecutionContext.of(i, directory);
+        TestExecutionContext testExecutionContext = TestExecutionContext.of(id, directory, properties, environments);
         testExecutionContexts.add(testExecutionContext);
         return testExecutionContext;
     }
 
-    private File getTextExecutionDirectoryFromIdentifier(int i) {
-        return new File(workspaceFolder.getAbsolutePath() + File.separator + "executions" + File.separator + i);
+    private File getTextExecutionDirectoryFromIdentifier(String id) {
+        return new File(workspaceFolder.getAbsolutePath() + File.separator + "executions" + File.separator + id);
     }
 
-    public Optional<TestExecutionContext> findTestExecutionContextById(Integer reportId) {
-        return this.testExecutionContexts.stream().filter(testExecutionContext -> testExecutionContext.getIdentifier() == reportId).findFirst();
+    public Optional<TestExecutionContext> findTestExecutionContextById(String reportId) {
+        return this.testExecutionContexts.stream().filter(testExecutionContext -> testExecutionContext.getIdentifier().equals(reportId)).findFirst();
     }
 
     public List<File> listFiles() {
-        return List.of(this.getRoot().listFiles());
+        return List.of(Objects.requireNonNull(this.getRoot().listFiles()));
     }
+
 }

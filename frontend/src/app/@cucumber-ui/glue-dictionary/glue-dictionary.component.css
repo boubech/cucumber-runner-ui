@@ -1,0 +1,12 @@
+section {
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table thead {
+  font-weight: bold;
+}

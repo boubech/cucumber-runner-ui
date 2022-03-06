@@ -21,6 +21,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/FileResponse"
+    delete:
+      operationId: deleteFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/FileToDeleteRequest"
+      responses:
+        '200':
+          description: File deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+
     post:
       operationId: uploadFile
       requestBody:
@@ -58,7 +76,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: "#/components/schemas/GlueResponse"
   /features:
     post:
       operationId: runFeature
@@ -76,6 +94,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FeatureRunnerResponse"
+
+
+  /test:
+    post:
+      operationId: runTest
+      summary: Execute a test
+      description: Execute a test
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestRequest"
+      responses:
+        '200':
+          description: Return log execution
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestResponse"
+
+  /test/{testId}:
+    get:
+      operationId: getTest
+      summary: get test
+      description: get test
+      parameters:
+        - in: path
+          name: testId
+          description: Test Identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return log execution
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestResponse"
+
   /html-reports/{reportHtmlId}:
     get:
       operationId: getHtmlReport
@@ -87,7 +145,7 @@ paths:
           description: HTML Report Identifier
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: HTML Report
@@ -98,6 +156,27 @@ paths:
 
 components:
   schemas:
+    GlueResponse:
+      type: object
+      required:
+        - name
+        - path
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+        comment:
+          type: string
+        clazz:
+          type: string
+        method:
+          type: string
+        arguments:
+          type: array
+          items:
+            type: string
+
     FileResponse:
       type: object
       required:
@@ -115,6 +194,48 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FileResponse"
+    FileToDeleteRequest:
+      type: object
+      required:
+        - path
+      properties:
+        path:
+          type: string
+
+    TestRequest:
+      type: object
+      required:
+        - feature
+      properties:
+        feature:
+          type: array
+          items:
+            type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatureRunnerOptionRequest"
+
+    TestResponse:
+      type: object
+      required:
+        - feature
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [running, failed, success]
+        reportHtmlId:
+          type: string
+        reportJson:
+          type: array
+          items:
+            type: string
+        reportPretty:
+          type: array
+          items:
+            type: string
 
     FeatureRunnerRequest:
       type: object
@@ -128,14 +249,21 @@ components:
         options:
           type: array
           items:
-            $ref: "#/components/schemas/FeatureRunnerResponse"
+            $ref: "#/components/schemas/FeatureRunnerOptionRequest"
     FeatureRunnerOptionRequest:
       type: object
+      required:
+        - key
+        - value
+        - type
       properties:
-        code:
+        key:
           type: string
-        text:
+        value:
           type: string
+        type:
+          type: string
+          enum: [property, environment]
     FeatureRunnerResponse:
       type: object
       required:
@@ -145,11 +273,9 @@ components:
         - reportPretty
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
         reportHtmlId:
-          type: integer
-          format: int64
+          type: string
         reportJson:
           type: array
           items:

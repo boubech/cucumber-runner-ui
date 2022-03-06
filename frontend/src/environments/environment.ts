@@ -5,7 +5,8 @@
 export const environment = {
   uiVersion: require('../../package.json').version + '-dev',
   production: false,
-  baseUrl : '/api'
+  baseUrl : '/api',
+  webSocketURL: 'ws://localhost:8080/ws'
 };
 
 /*

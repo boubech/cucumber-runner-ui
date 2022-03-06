@@ -2,6 +2,8 @@
 .file,
 .directory {
   display:table;
+  overflow-x: hidden;
+  font-size: 1rem;
 }
 .file {
   padding-left: 1.5pc;
@@ -12,6 +14,7 @@
   display:table-cell;
   vertical-align:middle;
   padding-left: 0.5pc;
+  cursor: default;
 }
 
 .directory .open,
@@ -20,7 +23,22 @@
   margin-left: 0pc;
 }
 
+.open:hover,
+.close:hover {
+  line-height: 2rem;
+  color: black;
+}
 
 .directory-content {
   margin-left: 24px;
+}
+
+
+.mat-icon {
+  line-height: 2rem;
+  color: rgb(71, 71, 71)
+}
+
+.selected {
+  background-color: #dddddd;
 }

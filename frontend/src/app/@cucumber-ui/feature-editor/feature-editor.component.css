@@ -10,31 +10,38 @@ header {
   height: 2rem;
   vertical-align: middle;
   line-height: 2rem;
-  text-indent: 1rem;
 }
 
 header span {
   height: 2rem;
   float: left;
   display: block;
+  padding-left: 0.5rem;
 }
 
 .content {
   flex: 1;
   width: 100%;
   overflow: auto;
-  padding: 1rem;
-  background-color: #393a34;
-  color: #dddddd;
-
   display: flex;
   flex-flow: column;
   height: 100%;
 }
+
 footer {
   height: 2rem;
   border-top : 1px solid black;
+  vertical-align: middle;
+  line-height: 2rem;
 }
+
+footer span {
+  height: 2rem;
+  float: left;
+  display: block;
+  padding-left: 0.5rem;
+}
+
 
 mat-icon {
   display: block;
@@ -47,6 +54,15 @@ mat-icon[name=start]{
 
 mat-icon[name=stop]{
   color: darkred;
+}
+
+mat-icon[name=start],
+mat-icon[name=stop]{
+  opacity: 0.6;
+}
+mat-icon[name=start]:hover,
+mat-icon[name=stop]:hover{
+  opacity: 1;
 }
 
 .line {
@@ -93,3 +109,12 @@ mat-icon[name=stop]{
   opacity: 0.5;
 }
 
+.mat-icon {
+  padding-top: 2px;
+}
+.mat-icon[name="success"] {
+  color: green;
+}
+.mat-icon[name="failure"] {
+  color: red;
+}

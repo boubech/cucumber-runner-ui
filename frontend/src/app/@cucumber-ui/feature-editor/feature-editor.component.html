@@ -14,28 +14,25 @@
     #editorDiv
   ></div>
 
-  <!--
-
-  <div class="content"  [contentEditable]="true" (input)="editorOnChange()"  >
-    <div class="line">example</div>
-  </div>
-  -->
-  <!--
-
-  <div class="content" #editorDiv [contentEditable]="true" (input)="editorOnChange()" (keydown.enter)="onKeydown($event)" >
-  </div>
-
-  <div class="content" #editorDiv>
-    <div *ngFor="let line of lines; let index = index;" class="line">
-      <span>{{index}}</span><input type="text" [(ngModel)]="line.value" (keydown.enter)="onKeydownLine($event)" />
-    </div>
-    <div class="blank" (click)="editorOnClick()">
-    </div>
-  </div>
-  -->
-
   <footer>
-
+    <span *ngIf="state">
+      Tests status :
+    </span>
+    <span *ngIf="state">
+      <mat-icon name="success" *ngIf="state.match('success')" aria-hidden="false" aria-label="success">check</mat-icon>
+      <mat-icon name="failure" *ngIf="state.match('failure')" aria-hidden="false" aria-label="failure">close</mat-icon>
+    </span>
+    <span *ngIf="state">|</span>
+    <span *ngIf="state">
+      Scenarios run: {{testResult.scenarioFailures}},
+      Failures: {{testResult.scenarioFailures}}
+    </span>
+    <span *ngIf="state">|</span>
+    <span *ngIf="state">
+      Steps run: {{testResult.stepRun}},
+      Failures: {{testResult.stepFailures}},
+      Skipped: {{testResult.stepSkippeds}}
+    </span>
   </footer>
 </section>
 

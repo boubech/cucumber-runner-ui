@@ -1,5 +1,8 @@
 package com.boubech.cucumber.ui.services;
 
+import com.github.jknack.handlebars.internal.lang3.tuple.Pair;
+import lombok.Builder;
+import lombok.Getter;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.springframework.stereotype.Component;
@@ -37,7 +40,7 @@ public class CucumberService {
         this.dynamiqueClassLoadService = dynamiqueClassLoadService;
     }
 
-    public List<String> getGluesDefinitions() {
+    public List<Glue> getGluesDefinitions() {
         try {
             return this.dynamiqueClassLoadService.getClasses()
                     .stream()
@@ -60,7 +63,7 @@ public class CucumberService {
         return true;
     }
 
-    private List<String> getCucumberStep(Class<?> aClass) {
+    private List<Glue> getCucumberStep(Class<?> aClass) {
         try {
             return Arrays.stream(aClass.getMethods())
                     .map(this::getStepValue)
@@ -73,7 +76,7 @@ public class CucumberService {
     }
 
 
-    private List<Class<?>> getCucumberGlueClass() throws IOException {
+    public List<Class<?>> getCucumberGlueClass() throws IOException {
         return this.dynamiqueClassLoadService.getClasses()
                 .stream()
                 .filter(this::excludeThirdLib)
@@ -81,53 +84,24 @@ public class CucumberService {
                 .collect(Collectors.toList());
     }
 
-    private Optional<String> getStepValue(Method method) {
+    private Optional<Glue> getStepValue(Method method) {
         Optional<Class<Annotation>> optionalAnnotation = CUCUMBER_ANNOTATION.stream()
                 .filter(method::isAnnotationPresent)
                 .findFirst();
         return optionalAnnotation.map(annotation -> {
             try {
                 Method getter = method.getAnnotation(annotation).getClass().getMethod("value");
-                return annotation.getName() + ":" + getter.invoke(method.getAnnotation(annotation));
+                return Glue.builder()
+                        .clazz(method.getDeclaringClass())
+                        .method(method)
+                        .value(getter.invoke(method.getAnnotation(annotation)).toString())
+                        .annotation(annotation)
+                        .build();
             } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
                 return null;
             }
         });
-    }
-
-    public void run(TestExecutionContext testExecutionContext) throws IOException {
-        ClassLoader classLoader = dynamiqueClassLoadService.get();
-        List<Class<?>> gluesClasses = getCucumberGlueClass();
-
-        List<String> arguments = new ArrayList<>();
-        arguments.add(testExecutionContext.getFeature().getAbsolutePath());
-
-        gluesClasses.forEach(clazz -> {
-            try {
-                classLoader.loadClass(clazz.getName());
-                addGlueToArg(arguments, clazz);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        });
-
-        addPluginToArgs(arguments, "html:" + testExecutionContext.getHtmlReport().getAbsolutePath());
-        addPluginToArgs(arguments, "json:" + testExecutionContext.getJsonReport().getAbsolutePath());
-        addPluginToArgs(arguments, "pretty:" + testExecutionContext.getPrettyReport().getAbsolutePath());
-
-        io.cucumber.core.cli.Main.run(arguments.toArray(String[]::new), classLoader);
-    }
-
-    private void addPluginToArgs(List<String> arguments, String plugin) {
-        arguments.add("--plugin");
-        arguments.add(plugin);
-    }
-
-
-    private void addGlueToArg(List<String> arguments, Class<?> clazz) {
-        arguments.add("--glue");
-        arguments.add(clazz.getPackageName());
     }
 
 }

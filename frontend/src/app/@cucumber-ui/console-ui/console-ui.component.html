@@ -3,7 +3,7 @@
 </script>
 
 <div class="terminal" >
-  <div #myDiv (scroll)="enableAutoScroll()" class="content">
+  <div #console (scroll)="enableAutoScroll()" class="content">
     <pre *ngFor="let line of lines" >
       <div [innerHtml]="line | ansiToHtml | spaceToHtml | safeHtml"></div>
     </pre>

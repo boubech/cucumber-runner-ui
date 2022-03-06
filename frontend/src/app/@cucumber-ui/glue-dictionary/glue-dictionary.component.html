@@ -1,0 +1,24 @@
+<section>
+  <table>
+    <thead>
+    <tr>
+      <td>Type</td>
+      <td>Expression</td>
+      <td>Class</td>
+      <td>Method</td>
+      <td>Args</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let glue of glues">
+      <td>{{glue.type}}</td>
+      <td>{{glue.value}}</td>
+      <td>{{glue.clazz}}</td>
+      <td>{{glue.method}}</td>
+      <td>{{glue.arguments}}</td>
+    </tr>
+    </tbody>
+  </table>
+</section>
+
+

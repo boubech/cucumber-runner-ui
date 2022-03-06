@@ -25,4 +25,9 @@ public class MyStepdefs {
     public void verify(int toTest) {
         assertThat(param).isEqualTo(toTest);
     }
+
+    @Then("un resultat {int}")
+    public void verify2(int toTest) {
+        assertThat(param).isEqualTo(toTest);
+    }
 }

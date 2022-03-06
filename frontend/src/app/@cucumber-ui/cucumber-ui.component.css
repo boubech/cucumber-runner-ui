@@ -1,10 +1,10 @@
 
-.toolbar {
-  background-color: lightgreen;
+.main {
+  height: 1vh;
 }
 
-.bottom-bar {
-
+.toolbar {
+  background-color: lightgreen;
 }
 
 .bottom-bar mat-tab-group {
@@ -41,3 +41,11 @@ app-feature-editor {
   width: 100%;
 }
 
+.settings td {
+  vertical-align: top;
+}
+
+
+.tab-icon {
+  margin-right: 10px;
+}
