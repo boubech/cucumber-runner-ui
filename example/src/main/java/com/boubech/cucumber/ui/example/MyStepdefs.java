@@ -4,6 +4,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -11,23 +13,19 @@ public class MyStepdefs {
 
     int param;
 
-    @Given("un parametre {int}")
-    public void set(int toInit) {
-        this.param = toInit;
+    @Given("an integer {int}")
+    public void set(int integerToDefine) {
+        this.param = integerToDefine;
     }
 
-    @When("un ajout de {int}")
-    public void add(int toAdd) {
-        param = param + toAdd;
+    @When("add {int}")
+    public void add(int integerToAdd) {
+        param = param + integerToAdd;
     }
 
-    @Then("un résultat {int}")
-    public void verify(int toTest) {
-        assertThat(param).isEqualTo(toTest);
+    @Then("the result is {int}")
+    public void verify(int integerToVerify) {
+        assertThat(param).isEqualTo(integerToVerify);
     }
 
-    @Then("un resultat {int}")
-    public void verify2(int toTest) {
-        assertThat(param).isEqualTo(toTest);
-    }
 }

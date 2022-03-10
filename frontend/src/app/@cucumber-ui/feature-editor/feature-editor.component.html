@@ -3,8 +3,8 @@
     <span>Gherkin Editor</span>
     <span>|</span>
     <span>
-       <mat-icon name="start" *ngIf="!running" aria-hidden="false" aria-label="start" (click)="executeFeature()">play_circle_outline</mat-icon>
-       <mat-icon name="stop" *ngIf="running" aria-hidden="false" aria-label="stop">stop</mat-icon>
+       <mat-icon name="start" [class.disabled]="" *ngIf="!running" matTooltip="Run tests" aria-hidden="false" aria-label="start" (click)="executeFeature()">play_arrow</mat-icon>
+       <mat-icon name="stop" *ngIf="running" matTooltip="Stop tests" aria-hidden="false" aria-label="stop">stop</mat-icon>
     </span>
   </header>
 
@@ -15,20 +15,21 @@
   ></div>
 
   <footer>
-    <span *ngIf="state">
+    <span *ngIf="test">
       Tests status :
     </span>
-    <span *ngIf="state">
-      <mat-icon name="success" *ngIf="state.match('success')" aria-hidden="false" aria-label="success">check</mat-icon>
-      <mat-icon name="failure" *ngIf="state.match('failure')" aria-hidden="false" aria-label="failure">close</mat-icon>
+    <span *ngIf="test!.state">
+      <mat-icon name="success" matTooltip="Success" *ngIf="test!.state!.match('success')" aria-hidden="false" aria-label="success">check</mat-icon>
+      <mat-icon name="failure" matTooltip="Failure" *ngIf="test!.state!.match('failure')" aria-hidden="false" aria-label="failure">warning</mat-icon>
+      <mat-icon name="error" matTooltip="Error" *ngIf="test!.state!.match('error')" aria-hidden="false" aria-label="error">error_outline</mat-icon>
     </span>
-    <span *ngIf="state">|</span>
-    <span *ngIf="state">
+    <span *ngIf="testResult">|</span>
+    <span *ngIf="testResult">
       Scenarios run: {{testResult.scenarioFailures}},
       Failures: {{testResult.scenarioFailures}}
     </span>
-    <span *ngIf="state">|</span>
-    <span *ngIf="state">
+    <span *ngIf="testResult">|</span>
+    <span *ngIf="testResult">
       Steps run: {{testResult.stepRun}},
       Failures: {{testResult.stepFailures}},
       Skipped: {{testResult.stepSkippeds}}

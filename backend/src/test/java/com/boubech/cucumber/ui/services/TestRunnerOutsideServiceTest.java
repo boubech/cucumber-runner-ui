@@ -33,11 +33,11 @@ class TestRunnerOutsideServiceTest {
     void given_feature_string_when_run_then_report_are_created() throws IOException, InterruptedException {
 
         TestExecutionContext testExecutionContext = workspaceService.createNewTestExecutionContext(Map.of(), Map.of());
-        Files.writeString(testExecutionContext.getFeature().toPath(), "Feature: Test\n" +
-                "  Scenario: Test nominal\n" +
-                "    Given un parametre 1\n" +
-                "    When un ajout de 1\n" +
-                "    Then un resultat 2");
+        Files.writeString(testExecutionContext.getFeature().toPath(), "Feature: Addition\n" +
+                "  Scenario: Nominal\n" +
+                "    Given an integer 1\n" +
+                "    When add -1\n" +
+                "    Then the result is 0");
 
         testExecutionContext.setState(TestExecutionContext.State.RUNNING);
         this.testRunnerCommandLine.run(testExecutionContext, t -> t.setState(TestExecutionContext.State.SUCCESS), t -> t.setState(TestExecutionContext.State.FAILED));

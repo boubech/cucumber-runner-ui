@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-  title: Sample API
-  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  title: Cucumber UI Runner API
+  description: This API permits to upload Cucumber Jar Project and run tests
   version: 1.0.0
 servers:
-  - url: http://localhost:4200/api/v1
+  - url: /api/v1
     description: Optional server description, e.g. Main (production) server
 paths:
   /files:
@@ -225,7 +225,7 @@ components:
           type: string
         status:
           type: string
-          enum: [running, failed, success]
+          enum: [running, failed, success, error]
         reportHtmlId:
           type: string
         reportJson:
@@ -271,6 +271,7 @@ components:
         - reportHtml
         - reportJson
         - reportPretty
+        - state
       properties:
         id:
           type: string
@@ -284,3 +285,6 @@ components:
           type: array
           items:
             type: string
+        state:
+          type: string
+          enum: [success, failure, error]

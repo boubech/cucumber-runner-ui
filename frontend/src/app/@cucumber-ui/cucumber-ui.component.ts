@@ -12,19 +12,19 @@ import {Test, TestRunnerService} from '../services/test-runner-service';
 })
 export class CucumberUiComponent implements OnInit {
 
-  files: FileResponse[] = [];
-  glues: GlueResponse[] = [];
+  files: FileResponse[] | undefined;
+  glues: GlueResponse[] | undefined;
   editorEnabled: boolean = true;
 
   test: Test = {
-    feature: 'Feature: Test \n' +
-      '  Scenario: Test nominal \n' +
-      '    Given un parametre 1 \n' +
-      '    When un ajout de 1 \n' +
-      '    Then un resultat 2 \n' +
-      '    Then un resultat 3',
+    feature: 'Feature: Addition \n' +
+      '  Scenario: Nominal test \n' +
+      '    Given an integer 1 \n' +
+      '    When add -1 \n' +
+      '    Then the result is 0 \n' +
+      '    Then the result is 1',
     settings: [
-      {key: "JAVA_OPT", value: '-Xmx512M', type: "environment"},
+      {key: "JAVA_OPTS", value: '-Xmx128M', type: "environment"},
       {key: "cucumber.publish.quiet", value: 'true', type: "property"}
     ]
   };
@@ -41,8 +41,8 @@ export class CucumberUiComponent implements OnInit {
   }
 
   refresh() {
-    this.refreshWorkspace();
     this.refreshGlues();
+    this.refreshWorkspace();
   }
 
   refreshWorkspace(): void {
@@ -69,10 +69,6 @@ export class CucumberUiComponent implements OnInit {
     if (test.reportHtmlId) {
       this.htmlReportUrl = this._testRunnerService.getHtmlReportUrlFromTest(test);
     }
-  }
-
-  onContentEditorChanged(editorContent: string) {
-    this.test.feature = editorContent;
   }
 
 }

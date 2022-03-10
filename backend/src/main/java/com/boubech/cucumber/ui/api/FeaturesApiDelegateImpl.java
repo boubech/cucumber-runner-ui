@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.boubech.cucumber.ui.model.FeatureRunnerResponse.StateEnum.*;
+
 @Component
 public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
 
@@ -32,10 +34,7 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
     @Override
     public ResponseEntity<FeatureRunnerResponse> runFeature(FeatureRunnerRequest featureRunnerRequest) {
         try {
-            Map<String, String> properties = featureRunnerRequest.getOptions().stream().filter(o -> o.getType().equals(FeatureRunnerOptionRequest.TypeEnum.PROPERTY)).collect(Collectors.toMap(FeatureRunnerOptionRequest::getKey, FeatureRunnerOptionRequest::getValue));
-            Map<String, String> environments = featureRunnerRequest.getOptions().stream().filter(o -> o.getType().equals(FeatureRunnerOptionRequest.TypeEnum.ENVIRONMENT)).collect(Collectors.toMap(FeatureRunnerOptionRequest::getKey, FeatureRunnerOptionRequest::getValue));
-            TestExecutionContext testExecutionContext = this.workspaceService.createNewTestExecutionContext(properties, environments);
-            Files.write(testExecutionContext.getFeature().toPath(), featureRunnerRequest.getFeature(), StandardCharsets.UTF_8);
+            TestExecutionContext testExecutionContext = buildNewTestExecution(featureRunnerRequest);
             runFeature(testExecutionContext);
             if (testExecutionContext.getState().equals(TestExecutionContext.State.ERROR)) {
                 throw new IllegalStateException("Error to run test" + String.join("\n", testExecutionContext.getLog()));
@@ -47,9 +46,18 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
         } catch (IOException | InterruptedException | IllegalStateException e) {
             e.printStackTrace();
             FeatureRunnerResponse response = new FeatureRunnerResponse();
+            response.setState(ERROR);
             response.reportPretty(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private TestExecutionContext buildNewTestExecution(FeatureRunnerRequest featureRunnerRequest) throws IOException {
+        Map<String, String> properties = featureRunnerRequest.getOptions().stream().filter(o -> o.getType().equals(FeatureRunnerOptionRequest.TypeEnum.PROPERTY)).collect(Collectors.toMap(FeatureRunnerOptionRequest::getKey, FeatureRunnerOptionRequest::getValue));
+        Map<String, String> environments = featureRunnerRequest.getOptions().stream().filter(o -> o.getType().equals(FeatureRunnerOptionRequest.TypeEnum.ENVIRONMENT)).collect(Collectors.toMap(FeatureRunnerOptionRequest::getKey, FeatureRunnerOptionRequest::getValue));
+        TestExecutionContext testExecutionContext = this.workspaceService.createNewTestExecutionContext(properties, environments);
+        Files.write(testExecutionContext.getFeature().toPath(), featureRunnerRequest.getFeature(), StandardCharsets.UTF_8);
+        return testExecutionContext;
     }
 
     private void runFeature(TestExecutionContext testExecutionContext) throws IOException, InterruptedException {
@@ -61,6 +69,10 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
                 t.setState(TestExecutionContext.State.ERROR);
             }
         });
+        waitUntilTextExecutionIsDone(testExecutionContext);
+    }
+
+    private void waitUntilTextExecutionIsDone(TestExecutionContext testExecutionContext) throws InterruptedException {
         do {
             Thread.sleep(100);
         } while (testExecutionContext.getState().equals(TestExecutionContext.State.RUNNING));
@@ -72,6 +84,19 @@ public class FeaturesApiDelegateImpl implements FeaturesApiDelegate {
         featureRunnerResponse.reportHtmlId(testExecutionContext.getHtmlReport().exists() ? testExecutionContext.getIdentifier() : null);
         featureRunnerResponse.reportJson(testExecutionContext.getJsonReport().exists() ? Files.readAllLines(testExecutionContext.getJsonReport().toPath()) : null);
         featureRunnerResponse.reportPretty(testExecutionContext.getPrettyReport().exists() ? Files.readAllLines(testExecutionContext.getPrettyReport().toPath()) : testExecutionContext.getLog());
+        switch (testExecutionContext.getState()) {
+            case ERROR:
+                featureRunnerResponse.setState(ERROR);
+                break;
+            case SUCCESS:
+                featureRunnerResponse.setState(SUCCESS);
+                break;
+            case FAILED:
+                featureRunnerResponse.setState(FAILURE);
+                break;
+            default:
+                break;
+        }
         return featureRunnerResponse;
     }
 

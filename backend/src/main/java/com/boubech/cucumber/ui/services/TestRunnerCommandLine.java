@@ -37,10 +37,14 @@ public class TestRunnerCommandLine {
         List<String> command = getInterpreterCommand();
         List<String> interpreterArgs = new ArrayList<>();
         interpreterArgs.add("java");
-        Optional.ofNullable(testExecutionContext.getEnvironments().get("JAVA_OPT")).ifPresent(interpreterArgs::add);
+        Optional.ofNullable(testExecutionContext.getEnvironments().get("JAVA_OPTS")).ifPresent(interpreterArgs::add);
+
+        testExecutionContext.getProperties()
+                .entrySet()
+                .forEach(property -> interpreterArgs.add("\"-D" + property.getKey().trim() + "=" + property.getValue().trim() + "\""));
+
         interpreterArgs.add("-cp");
         interpreterArgs.add(getClassPath());
-        interpreterArgs.add("-Dcucumber.publish.quiet=true");
         interpreterArgs.add("io.cucumber.core.cli.Main");
         interpreterArgs.add(getRelativePath(testExecutionContext.getFeature(), workspaceService.getRoot()));
 

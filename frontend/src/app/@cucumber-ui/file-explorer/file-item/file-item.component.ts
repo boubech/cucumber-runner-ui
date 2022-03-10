@@ -11,6 +11,7 @@ export class FileItemComponent implements OnInit {
   @Input() file: FileExplorerItem | undefined;
   @Output() onSelected = new EventEmitter<FileExplorerItem>();
   @Output() onUnselected = new EventEmitter<FileExplorerItem>();
+  @Output() onDelete = new EventEmitter<FileExplorerItem>();
 
   hideDirectoryContent: boolean = true;
   isFocused: boolean = false;
@@ -47,9 +48,12 @@ export class FileItemComponent implements OnInit {
 
   onSelectItem(fileExplorerItemSelected: FileExplorerItem) : void {
     this.file!.selected = false;
-    this.file?.files?.filter(file => file.path != fileExplorerItemSelected.path).forEach(file => file.selected = false);
+    this.file?.files?.filter(file => file.path != fileExplorerItemSelected.path)
+                     .forEach(file => file.selected = false);
     this.onSelected.emit(fileExplorerItemSelected);
   }
+
+
 
   onUnselectItem(fileExplorerItemSelected: FileExplorerItem) : void {
     this.onUnselected.emit(fileExplorerItemSelected);
@@ -63,5 +67,7 @@ export class FileItemComponent implements OnInit {
     }
   }
 
-
+  delete(file: FileExplorerItem) {
+    this.onDelete.emit(file)
+  }
 }

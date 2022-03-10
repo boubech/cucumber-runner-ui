@@ -20,13 +20,13 @@ body {
 }
 
 .passed {
-  color: green;
+  color: #00a40b;
 }
 .failed {
-  color: orange;
+  color: #d78f00;
 }
 .undefined {
-  color: red;
+  color: #de0000;
 }
 .skipped {
   text-decoration: line-through;

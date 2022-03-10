@@ -15,9 +15,10 @@ export interface RowSetting {
 })
 export class RunnerSettingsComponent implements OnInit {
 
-  displayedColumns: string[] = ['name', 'value', 'action'];
+  displayedColumns: string[] = ['name', 'value'];
 
   @Input("settings") settings: Setting[] = [];
+  @Input("title") title: string = '';
   @Input("type") type: 'property' | 'environment' | undefined;
 
   @ViewChild(MatTable, {static: true}) table: MatTable<RowSetting> | undefined;
@@ -45,7 +46,7 @@ export class RunnerSettingsComponent implements OnInit {
     this.copyToSettings();
   }
 
-  private copyToSettings() {
+  copyToSettings() {
     this.dataSource.filter(r => r.setting.key != '' || r.setting.value != '').forEach(row => {
       let found = this.settings.find(setting => row.setting.key == setting.key);
       if (found) {
@@ -53,19 +54,40 @@ export class RunnerSettingsComponent implements OnInit {
       } else {
         this.settings.push(row.setting);
       }
-    })
+    });
+    this.removeEmptySetting()
+  }
+
+  removeEmptySetting() {
+    let i = this.settings.length - 1;
+    if (i >= 0) {
+      while (i >= 0) {
+        var setting = this.settings[i];
+        if (setting.key.trim().length == 0) {
+          this.settings.splice(i, 1);
+          i = i - 1;
+        }
+        i = i - 1;
+      }
+    }
   }
 
   addRowIfNeeded() {
-    let lastRow = this.dataSource[this.dataSource.length - 1];
-    if (lastRow) {
+    let addRow = false;
+    if (this.dataSource.length > 0) {
+      let lastRow = this.dataSource[this.dataSource.length - 1];
       if (lastRow.setting.key != '' && lastRow.setting.value != '') {
-        this.dataSource.push(<RowSetting>{
-          index: this.getMaxIndexAndIncrement(),
-          setting: {key: '', value: '', type: this.type}
-        });
-        this.renderRows();
+        addRow = true;
       }
+    } else {
+      addRow = true;
+    }
+    if (addRow) {
+      this.dataSource.push(<RowSetting>{
+        index: this.getMaxIndexAndIncrement(),
+        setting: {key: '', value: '', type: this.type}
+      });
+      this.renderRows();
     }
   }
 
@@ -75,15 +97,7 @@ export class RunnerSettingsComponent implements OnInit {
     }
   }
 
-  deleteRow(row: RowSetting) {
-    console.log(row)
-    this.dataSource = this.dataSource.filter(r => r.index != row.index);
-    this.addRowIfNeeded();
-    this.renderRows();
-    this.copyToSettings();
-  }
-
-  private purgeEmptyRow() {
+  purgeEmptyRow() {
     this.dataSource = this.dataSource.filter(r => r.setting.key != '' || r.setting.value != '');
   }
 

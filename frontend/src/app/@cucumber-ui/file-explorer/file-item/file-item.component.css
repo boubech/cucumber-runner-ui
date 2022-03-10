@@ -19,8 +19,8 @@
 
 .directory .open,
 .directory .close {
-  margin-right: 0pc;
-  margin-left: 0pc;
+  margin-right: 0px;
+  margin-left: 0px;
 }
 
 .open:hover,

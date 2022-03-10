@@ -90,6 +90,19 @@ export class FileExplorerComponent {
     });
   }
 
+  deleteFile(file: FileExplorerItem): void {
+    this._workspaceService.deleteFiles([file].map(file => {
+      return {path: file.path};
+    })).subscribe(() => {
+      this._workspaceService.getFiles().subscribe(files => {
+        this.files?.splice(0, this.files.length);
+        files[0].files!.forEach(file => this.files!.push(file))
+        this.updateAllItems();
+        this.filesDeleted.emit([file])
+      });
+    });
+  }
+
   getFileSelected(files: FileExplorerItem[]): FileExplorerItem[] {
     let filesSelected = files.filter(file => file.selected);
 

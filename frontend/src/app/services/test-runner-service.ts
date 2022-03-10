@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {ApiConfiguration} from "../api/api-configuration";
-import {map, observable, Observable, of} from "rxjs";
+import {map, Observable} from "rxjs";
 import {ApiService} from "../api/services/api.service";
 import {FeatureRunnerOptionRequest} from "../api/models/feature-runner-option-request";
 
@@ -11,6 +11,7 @@ export interface Test {
   reportJson?: Array<string>;
   reportPretty?: Array<string>;
   settings: Array<Setting>;
+  state?: 'running' | 'success' | 'failure' | 'error'
 }
 
 export interface Setting {
@@ -30,7 +31,6 @@ export class TestRunnerService {
   }
 
   run(test: Test): Observable<Test> {
-
     let options: FeatureRunnerOptionRequest[] = test.settings.map(setting => {
       return {key: setting.key, value: setting.value, type: setting.type}
     });
@@ -39,6 +39,19 @@ export class TestRunnerService {
       test.reportHtmlId = response.reportHtmlId;
       test.reportJson = response.reportJson;
       test.reportPretty = response.reportPretty;
+      switch (response.state) {
+        case "error":
+          test.state = 'error';
+          break;
+        case "failure":
+          test.state = 'failure';
+          break;
+        case "success":
+          test.state = 'success';
+          break;
+        default:
+          break;
+      }
       return test;
     }));
   }

@@ -113,8 +113,11 @@ mat-icon[name=stop]:hover{
   padding-top: 2px;
 }
 .mat-icon[name="success"] {
-  color: green;
+  color: #00a40b;
 }
 .mat-icon[name="failure"] {
-  color: red;
+  color: #d78f00;
+}
+.mat-icon[name="error"] {
+  color: #de0000;
 }

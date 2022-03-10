@@ -1,9 +1,10 @@
 <div [class.selected]="file!.selected">
   <div>
     <div class="file" *ngIf="!file!.isDirectory">
-      <mat-icon aria-hidden="false" aria-label="File" *ngIf="!file!.isDirectory" (click)="select()" >insert_drive_file
+      <mat-icon [matMenuTriggerFor]="fileMenu" aria-hidden="false" aria-label="File" *ngIf="!file!.isDirectory"
+                (click)="select()">insert_drive_file
       </mat-icon>
-      <span (click)="select()">{{file!.name}}</span>
+      <span (click)="select()" [matMenuTriggerFor]="fileMenu">{{file!.name}}</span>
     </div>
     <div class="directory" *ngIf="file!.isDirectory">
       <mat-icon class="open" aria-hidden="false" aria-label="Open" *ngIf="file!.isDirectory && hideDirectoryContent"
@@ -12,14 +13,42 @@
       <mat-icon class="close" aria-hidden="false" aria-label="Close" *ngIf="file!.isDirectory && !hideDirectoryContent"
                 (click)="showOrHideDirectoryContent()">expand_less
       </mat-icon>
-      <mat-icon aria-hidden="false" aria-label="Directory" *ngIf="file!.isDirectory" (click)="select()">folder
+      <mat-icon [matMenuTriggerFor]="directoryMenu" aria-hidden="false" aria-label="Directory" *ngIf="file!.isDirectory"
+                (click)="select()">folder
       </mat-icon>
-      <span (click)="select()">{{file!.name}}</span>
+      <span (click)="select()" [matMenuTriggerFor]="directoryMenu">{{file!.name}}</span>
     </div>
   </div>
   <div>
     <div class="directory-content" *ngIf="file!.isDirectory && !hideDirectoryContent">
-      <app-file-item class="subfile" *ngFor="let subfile of file!.files" [file]="subfile" (onSelected)="onSelectItem($event)" (onUnselected)="onUnselectItem($event)"></app-file-item>
+      <app-file-item class="subfile" *ngFor="let subfile of file!.files"
+                     [file]="subfile"
+                     (onSelected)="onSelectItem($event)"
+                     (onUnselected)="onUnselectItem($event)"
+                     (onDelete)="delete($event)"></app-file-item>
     </div>
   </div>
 </div>
+
+<mat-menu #fileMenu="matMenu">
+  <button disabled mat-menu-item>
+    <mat-icon>download</mat-icon>
+    <span>Download</span>
+  </button>
+  <button mat-menu-item (click)="delete(file!)">
+    <mat-icon>delete</mat-icon>
+    <span>Delete</span>
+  </button>
+</mat-menu>
+
+<mat-menu #directoryMenu="matMenu">
+  <button disabled mat-menu-item>
+    <mat-icon>upload</mat-icon>
+    <span>Upload</span>
+  </button>
+  <button mat-menu-item (click)="delete(file!)">
+    <mat-icon>delete</mat-icon>
+    <span>Delete</span>
+  </button>
+</mat-menu>
+

@@ -1,9 +1,5 @@
-<script>
-  alert('ok')
-</script>
-
 <div class="terminal" >
-  <div #console (scroll)="enableAutoScroll()" class="content">
+  <div #console class="content">
     <pre *ngFor="let line of lines" >
       <div [innerHtml]="line | ansiToHtml | spaceToHtml | safeHtml"></div>
     </pre>
