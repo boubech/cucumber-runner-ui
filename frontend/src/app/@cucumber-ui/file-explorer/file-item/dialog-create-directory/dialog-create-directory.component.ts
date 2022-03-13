@@ -18,6 +18,7 @@ export class DialogCreateDirectoryComponent implements OnInit {
   ) {}
 
   onNoClick(): void {
+    this.data.directory = undefined;
     this.dialogRef.close();
   }
 

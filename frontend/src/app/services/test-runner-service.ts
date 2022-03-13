@@ -3,6 +3,7 @@ import {ApiConfiguration} from "../api/api-configuration";
 import {map, Observable} from "rxjs";
 import {ApiService} from "../api/services/api.service";
 import {FeatureRunnerOptionRequest} from "../api/models/feature-runner-option-request";
+import { TestResponse } from "../api/models";
 
 export interface Test {
   feature: string;
@@ -55,4 +56,41 @@ export class TestRunnerService {
       return test;
     }));
   }
+
+  run2(test: Test): Observable<Test> {
+    let options: FeatureRunnerOptionRequest[] = test.settings.map(setting => {
+      return {key: setting.key, value: setting.value, type: setting.type}
+    });
+    return this._apiService.runTest({body: {feature: test.feature.split("\n"), options: options}}).pipe(map(response => {
+      return this.mapTestReponseToTest(response, test);
+    }));
+  }
+
+  get(test: Test): Observable<Test> {
+    return this._apiService.getTest({testId: test.id!}).pipe(map(response => {
+      return this.mapTestReponseToTest(response, test);
+    }));
+  }
+  
+  private mapTestReponseToTest(response: TestResponse, test: Test): Test {
+    test.id = response.id;
+    test.reportHtmlId = response.reportHtmlId;
+    test.reportJson = response.reportJson;
+    test.reportPretty = response.reportPretty;
+    switch (response.status) {
+      case "error":
+        test.state = 'error';
+        break;
+      case "failed":
+        test.state = 'failure';
+        break;
+      case "success":
+        test.state = 'success';
+        break;
+      default:
+        break;
+    }
+    return test;
+  }
+
 }

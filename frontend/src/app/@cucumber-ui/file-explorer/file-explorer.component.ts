@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import {FileResponse} from "../../api/models/file-response";
 import {WorkspaceService} from "../../services/workspace-service";
-import {FileToDeleteRequest} from "../../api/models/file-to-delete-request";
 
 export interface FileExplorerItem {
   parent?: FileExplorerItem;
@@ -23,7 +22,8 @@ export class FileExplorerComponent {
 
   @Input() files: FileResponse[] | undefined;
   @Output() fileUploaded = new EventEmitter<FileExplorerItem>();
-  @Output() filesDeleted = new EventEmitter<FileToDeleteRequest[]>();
+  @Output() filesDeleted = new EventEmitter<FileExplorerItem>();
+  @Output() filesUpdated = new EventEmitter<FileExplorerItem>();
 
   fileExplorerItems: FileExplorerItem[] = [];
 
@@ -44,7 +44,7 @@ export class FileExplorerComponent {
 
   private updateExisting(existingItems: FileExplorerItem[], updatedItems: FileExplorerItem[]) {
     updatedItems.forEach(itemToUpdate => {
-      let match = existingItems.find(i => i.path == itemToUpdate.path);
+      let match = this.findFileExplorerItem(itemToUpdate, existingItems);
       if (match && match.isDirectory) {
         this.updateExisting(match.files!, itemToUpdate.files!);
         this.removeNoExisting(match.files!, itemToUpdate.files!);
@@ -52,6 +52,22 @@ export class FileExplorerComponent {
         existingItems.push(itemToUpdate);
       }
     });
+  }
+  
+  private findFileExplorerItem(fileToFind: FileExplorerItem, files: FileExplorerItem[]): FileExplorerItem|undefined {
+    for(let file of files) {
+      if (file.path == fileToFind.path) {
+        return file;
+      } else if (file.isDirectory && file.path.startsWith(fileToFind.path) && file.files) {
+        return this.findFileExplorerItem(fileToFind, file.files);
+      }
+    }
+    return undefined;
+  }
+
+
+  private normalizePathAsUnix(path: String): string {
+    return path.replace(/\\/g, "/");
   }
 
   private removeNoExisting(existingItems: FileExplorerItem[], updatedItems: FileExplorerItem[]) {
@@ -64,25 +80,13 @@ export class FileExplorerComponent {
     toRemove.forEach(i => existingItems.splice(existingItems.indexOf(i), 1))
   }
 
-  deleteFile(file: FileExplorerItem): void {
-    this._workspaceService.deleteFiles([file].map(file => {
-      return {path: file.path};
-    })).subscribe(() => {
-      this._workspaceService.getFiles().subscribe(files => {
-        this.files?.splice(0, this.files.length);
-        files[0].files!.forEach(file => this.files!.push(file))
-        this.updateAllItems();
-        this.filesDeleted.emit([file])
-      });
-    });
-  }
 
   convert(files: FileResponse[], parent: FileExplorerItem | undefined): FileExplorerItem[] {
     return files ? files.map(file => {
       let item: FileExplorerItem = {
         parent: parent,
         name: file.name,
-        path: file.path,
+        path: this.normalizePathAsUnix(file.path),
         isDirectory: file.isDirectory,
         selected: false,
         isRoot: parent == undefined,
@@ -95,8 +99,16 @@ export class FileExplorerComponent {
     }) : [];
   }
 
-  uploadFile(event: FileExplorerItem) {
-    console.log(event)
+
+  onDeleteEvent(file: FileExplorerItem): void {
+    this.filesDeleted.emit(file)
+  }
+
+  onUploadEvent(event: FileExplorerItem) {
     this.fileUploaded.emit(event);
+  }
+
+  onUpdateEvent(event: FileExplorerItem) {
+    this.filesUpdated.emit(event);
   }
 }

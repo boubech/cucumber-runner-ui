@@ -14,6 +14,10 @@ mat-form-field {
   height: 20px;
 }
 
+:host ::ng-deep caption {
+  margin-bottom: 15px;
+}
+
 ::ng-deep .mat-form-field-wrapper {
   margin: 0 !important;
   padding: 0;
@@ -26,4 +30,7 @@ mat-form-field {
 ::ng-deep .mat-form-field-infix {
   margin: 0 !important;
   border: none !important;
+}
+:host ::ng-deep thead{
+  display: none;
 }

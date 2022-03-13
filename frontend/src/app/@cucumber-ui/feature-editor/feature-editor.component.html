@@ -3,8 +3,16 @@
     <span>Gherkin Editor</span>
     <span>|</span>
     <span>
-       <mat-icon name="start" [class.disabled]="" *ngIf="!running" matTooltip="Run tests" aria-hidden="false" aria-label="start" (click)="executeFeature()">play_arrow</mat-icon>
+       <mat-icon name="start" [class.disabled]="" *ngIf="!running" matTooltip="Run tests" aria-hidden="false" aria-label="start" (click)="run()">play_arrow</mat-icon>
        <mat-icon name="stop" *ngIf="running" matTooltip="Stop tests" aria-hidden="false" aria-label="stop">stop</mat-icon>
+    </span>
+    <span>|</span>
+    <span>
+      <mat-select>
+        <mat-option *ngFor="let lang of languages" [value]="languageSelected" (selectionChange)="onLanguageChange($event)">
+          {{lang}}
+        </mat-option>
+      </mat-select>
     </span>
   </header>
 
@@ -25,7 +33,7 @@
     </span>
     <span *ngIf="testResult">|</span>
     <span *ngIf="testResult">
-      Scenarios run: {{testResult.scenarioFailures}},
+      Scenarios run: {{testResult.scenarioRun}},
       Failures: {{testResult.scenarioFailures}}
     </span>
     <span *ngIf="testResult">|</span>

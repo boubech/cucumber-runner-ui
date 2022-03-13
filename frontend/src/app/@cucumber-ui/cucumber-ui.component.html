@@ -3,6 +3,7 @@
     <app-file-explorer [files]="files"
                        (fileUploaded)="refresh()"
                        (filesDeleted)="refresh()"
+                       (filesUpdated)="refresh()"
                        *ngIf="files"
     >
     </app-file-explorer>

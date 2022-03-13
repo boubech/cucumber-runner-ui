@@ -22,12 +22,12 @@ import {GherkinHighlightRulesService} from './gherkin-hightlight-rules.service';
 import {GlueResponse} from 'src/app/api/models';
 
 
-class TestResult {
-  stepRun: number = 0;
-  stepFailures: number = 0;
-  stepSkippeds: number = 0;
-  scenarioRun: number = 0;
-  scenarioFailures: number = 0;
+export interface TestResult {
+  stepRun: number;
+  stepFailures: number;
+  stepSkippeds: number;
+  scenarioRun: number;
+  scenarioFailures: number;
 }
 
 @Component({
@@ -46,6 +46,8 @@ export class FeatureEditorComponent {
   running: boolean = false;
   codeEditor: any;
   testResult: TestResult | undefined;
+  languages: Array<string> | undefined;
+  languageSelected: string = 'en';
 
 
   @ViewChild('editorDiv') editor: ElementRef | undefined;
@@ -64,7 +66,7 @@ export class FeatureEditorComponent {
 
   initCodeEditor(config: any): void {
     this._gherkinHighlightRulesService.init();
-
+    this.languages = this._gherkinHighlightRulesService.getLanguagesAvailables();
     const options = {
       value: this.test?.feature,
       minLines: 20,
@@ -90,27 +92,64 @@ export class FeatureEditorComponent {
     })
   }
 
-  executeFeature(): void {
-    this.running = true;
-    this._testRunnerService.run(this.test!).subscribe({
-      next: test => {
-        this.getTestResult(test);
-      },
-      error: error => {
-        this.getTestResult(error.error);
-      }
-    });
+  onLanguageChange(event: any) {
+    console.log(event)
+    this._gherkinHighlightRulesService.setLanguages(event);
   }
 
-  getTestResult(test: Test): void {
+  run(): void {
+    this.running = true;
+    const self = this;
+    let getTestResult = () => {
+      self._testRunnerService.get(self.test!).subscribe({
+        next: (test: Test) => {
+          self.parseTestResult(test);
+          if (this.shouldReloadTest(test)) {
+            setTimeout(getTestResult, 2000);
+          }
+        },
+        error: (error: { error: Test; }) => {
+          let test = error.error;
+          self.parseTestResult(test);
+          if (this.shouldReloadTest(test)) {
+            setTimeout(getTestResult, 2000);
+          }
+        }
+      });
+    };
+
+    this._testRunnerService.run2(this.test!).subscribe(() => getTestResult())
+  }
+
+  stop() {
+    this.test!.id = undefined
+    this.test!.state = undefined
+  }
+
+  private shouldReloadTest(test: Test) : boolean {
+    return  test.state == undefined || 
+            test.state == 'running' || 
+            test.reportJson == undefined || 
+            test.reportPretty == undefined
+  }
+
+  parseTestResult(test: Test): void {
     this.test!.id = test.id;
     this.test!.reportPretty = test.reportPretty;
     this.test!.reportHtmlId = test.reportHtmlId;
     this.test!.reportJson = test.reportJson;
     this.test!.state = test.state;
-    this.running = false;
-    this.onTestChange.emit(this.test);
-    this.parseJsonResult();
+    switch(this.test?.state) {
+      case 'running':
+        break;
+      case 'failure':
+      case 'success':
+      case 'error':
+        this.running = false;
+        this.onTestChange.emit(this.test);
+        this.parseJsonResult();
+        break;
+    }
   }
 
   parseJsonResult(): void {
@@ -118,10 +157,12 @@ export class FeatureEditorComponent {
       let jsonResult = JSON.parse(this.test.reportJson.join(""));
       let lines = this.editor?.nativeElement.querySelectorAll('.ace_line');
       this.resetLineStyles(lines);
-      this.testResult = new TestResult();
+      let testResult: TestResult = {stepFailures: 0, stepRun: 0, stepSkippeds:0, scenarioFailures:0, scenarioRun: 0}
+      this.testResult = undefined;
       if (jsonResult[0]) {
-        jsonResult[0].elements.forEach((scenario: any) => this.parseJsonResultScenario(this.testResult!, scenario, lines))
+        jsonResult[0].elements.forEach((scenario: any) => this.parseJsonResultScenario(testResult, scenario, lines))
       }
+      this.testResult = testResult;
     }
   }
 
@@ -129,6 +170,9 @@ export class FeatureEditorComponent {
     testResult.scenarioRun = testResult.scenarioRun + 1;
     let errorOcccured = false;
     for (let step of scenario.steps) {
+      if (!step.line || step.line > lines.length){
+        continue;
+      }
       this._rendered.addClass(lines[step.line - 1], step.result.status);
       switch (step.result.status) {
         case 'passed':
@@ -144,9 +188,9 @@ export class FeatureEditorComponent {
           errorOcccured = true;
           break;
       }
-      if (errorOcccured) {
-        testResult.scenarioFailures = testResult.scenarioFailures + 1;
-      }
+    }
+    if (errorOcccured) {
+      testResult.scenarioFailures = testResult.scenarioFailures + 1;
     }
   }
 

@@ -5,8 +5,9 @@
   <div>
     <app-file-item *ngFor="let file of fileExplorerItems"
                    [file]="file"
-                   (onDelete)="deleteFile($event)"
-                   (onUpload)="uploadFile($event)"
+                   (onDelete)="onDeleteEvent($event)"
+                   (onUpload)="onUploadEvent($event)"
+                   (onUpdate)="onUpdateEvent($event)"
     ></app-file-item>
   </div>
   <footer>

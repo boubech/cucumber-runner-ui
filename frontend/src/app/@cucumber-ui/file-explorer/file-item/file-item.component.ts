@@ -3,6 +3,7 @@ import {FileExplorerItem} from "../file-explorer.component";
 import {WorkspaceService} from "../../../services/workspace-service";
 import {DialogCreateDirectoryComponent} from "./dialog-create-directory/dialog-create-directory.component";
 import {MatDialog} from "@angular/material/dialog";
+import { DialogRenameComponent } from './dialog-rename/dialog-rename.component';
 
 @Component({
   selector: 'app-file-item',
@@ -14,6 +15,7 @@ export class FileItemComponent {
   @Input() file: FileExplorerItem | undefined;
   @Output() onSelected = new EventEmitter<FileExplorerItem>();
   @Output() onUnselected = new EventEmitter<FileExplorerItem>();
+  @Output() onUpdate = new EventEmitter<FileExplorerItem>();
   @Output() onDelete = new EventEmitter<FileExplorerItem>();
   @Output() onUpload = new EventEmitter<FileExplorerItem>();
 
@@ -55,6 +57,12 @@ export class FileItemComponent {
   }
 
   delete(file: FileExplorerItem) {
+    this._workspaceService.deleteFiles(file.path).subscribe(() => {
+      this.onDeleteEvent(file)
+    });
+  }
+
+  onDeleteEvent(file: FileExplorerItem) {
     this.onDelete.emit(file)
   }
 
@@ -70,18 +78,47 @@ export class FileItemComponent {
   }
 
   makeDirectory() {
-
     const dialogRef = this.dialog.open(DialogCreateDirectoryComponent, {
       width: '250px',
       data: {directory: 'sub-directory'},
     });
-
     dialogRef.afterClosed().subscribe((directoryName: string) => {
+      if (directoryName == undefined)
+        return;
       this._workspaceService.makeDirectory(this.file?.path + '/' + directoryName).subscribe(result => {
-        this.onUpload.emit(this.file)
+        this.onUpdate.emit(this.file)
       });
     });
+  }
 
+  rename() {
+    const dialogRef = this.dialog.open(DialogRenameComponent, {
+      width: '250px',
+      data: {newName: this.file?.name},
+    });
+    dialogRef.afterClosed().subscribe((newName: string) => {
+      if (newName == undefined)
+        return;
+      let newPath = this.file?.path.replace(/\/[^\/]*$/i, '/') + newName;
+      this._workspaceService.moveFile(this.file!.path, newPath).subscribe({
+        next: () => {
+          this.file!.name = newName;
+          this.file!.path = newPath;
+          this.onUpdateEvent(this.file!)
+        },
+        error: (error) => {
+          console.log(error)
+        }
+      });
+    });
+  }
+
+  onUpdateEvent(fileExplorerItem: FileExplorerItem) {
+    this.onUpdate.emit(fileExplorerItem);
+  }
+
+  open() {
+    this._workspaceService.openFile(this.file?.path!);
   }
 }
 

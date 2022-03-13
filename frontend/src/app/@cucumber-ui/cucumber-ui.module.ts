@@ -16,6 +16,9 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatMenuModule} from "@angular/material/menu";
 import { DialogCreateDirectoryComponent } from './file-explorer/file-item/dialog-create-directory/dialog-create-directory.component';
+import { DialogRenameComponent } from './file-explorer/file-item/dialog-rename/dialog-rename.component';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -23,7 +26,8 @@ import { DialogCreateDirectoryComponent } from './file-explorer/file-item/dialog
     FileItemComponent,
     FeatureEditorComponent,
     RunnerSettingsComponent,
-    DialogCreateDirectoryComponent
+    DialogCreateDirectoryComponent,
+    DialogRenameComponent
   ],
   imports: [
     BrowserModule,
@@ -37,7 +41,9 @@ import { DialogCreateDirectoryComponent } from './file-explorer/file-item/dialog
     MatInputModule,
     MatButtonModule,
     MatTooltipModule,
-    MatMenuModule
+    MatMenuModule,
+    MatSelectModule,
+    MatOptionModule
   ],
   exports: [
     FileExplorerComponent,

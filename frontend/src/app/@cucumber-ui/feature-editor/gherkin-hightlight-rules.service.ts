@@ -10,19 +10,34 @@ let aceBuilds = require('ace-builds')
 @Injectable({providedIn: 'root'})
 export class GherkinHighlightRulesService {
 
-  private languages = [{
-    name: "en",
-    labels: "Feature|Background|Scenario(?: Outline)?|Examples",
-    keywords: "Given|When|Then|And|But"
-  }, {
-    name: "fr",
-    labels: "Fonctionnalité|Contexte|Scénario|Plan du scénario|Exemples",
-    keywords: "Soit|Etant donné que|Etant donné qu'|Quand|Lorsque|Lorsqu'|Alors|Et|Mais"
-  }
+  private languages = [
+    {
+      name: "en",
+      labels: "Feature|Background|Scenario(?: Outline)?|Examples",
+      keywords: "Given|When|Then|And|But"
+    }, {
+      name: "fr",
+      labels: "Fonctionnalité|Contexte|Scénario|Plan du scénario|Exemples",
+      keywords: "Soit|Etant donné que|Etant donné qu'|Quand|Lorsque|Lorsqu'|Alors|Et|Mais"
+    }
   ];
 
+  private langueSelected: string = "en";
+
   getLanguagesLabels() {
-    return this.languages.map(item => item.labels).flatMap(x => x.split('|'));
+    return this.languages.filter(i => i.name == this.langueSelected).map(item => item.labels).flatMap(x => x.split('|'));
+  }
+
+  private getLanguagesConfiguration(): Array<any> {
+    return this.languages.filter(i => i.name == this.langueSelected);
+  }
+
+  getLanguagesAvailables(): Array<string> {
+    return this.languages.map(item => item.name);
+  }
+
+  setLanguages(langueSelected: string) {
+    this.langueSelected = langueSelected;
   }
 
   init(): void {
@@ -36,10 +51,10 @@ export class GherkinHighlightRulesService {
       var GherkinHighlightRules = function (this: any) {
 
 
-        var labels = self.languages.map(function (l) {
+        var labels = self.getLanguagesConfiguration().map(function (l) {
           return l.labels;
         }).join("|");
-        var keywords = self.languages.map(function (l) {
+        var keywords = self.getLanguagesConfiguration().map(function (l) {
           return l.keywords;
         }).join("|");
         this.$rules = {
