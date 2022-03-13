@@ -29,6 +29,73 @@ paths:
               schema:
                 type: string
                 example: pong
+  /files/{pathB64}:
+    delete:
+      operationId: deleteFile
+      parameters:
+        - in: path
+          name: pathB64
+          description: File path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+    post:
+      operationId: moveFile
+      summary: Move file
+      description: Move file
+      parameters:
+        - in: path
+          name: pathB64
+          description: File path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dest:
+                  type: string
+                  format: string
+              required:
+                - dest
+      responses:
+        '200':
+          description: File deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+
+  /files/{pathB64}/content:
+    get:
+      operationId: getFileContent
+      parameters:
+        - in: path
+          name: pathB64
+          description: File path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File content
+          content:
+            application/*:
+              schema:
+                type: string
+                format: binary
   /files:
     get:
       operationId: getFiles
@@ -43,25 +110,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/FileResponse"
-    delete:
-      operationId: deleteFile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/FileToDeleteRequest"
-      responses:
-        '200':
-          description: File deleted
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: pong
 
-    post:
+    put:
       operationId: uploadFile
       requestBody:
         content:
@@ -99,24 +149,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/GlueResponse"
-  /features:
-    post:
-      operationId: runFeature
-      summary: Execute a feature
-      description: Execute a feature
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FeatureRunnerRequest"
-      responses:
-        '200':
-          description: Return log execution
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FeatureRunnerResponse"
-
 
   /test:
     post:
@@ -210,6 +242,8 @@ components:
           type: string
         path:
           type: string
+        pathB64:
+          type: string
         isDirectory:
           type: boolean
         files:
@@ -259,19 +293,6 @@ components:
           items:
             type: string
 
-    FeatureRunnerRequest:
-      type: object
-      required:
-        - feature
-      properties:
-        feature:
-          type: array
-          items:
-            type: string
-        options:
-          type: array
-          items:
-            $ref: "#/components/schemas/FeatureRunnerOptionRequest"
     FeatureRunnerOptionRequest:
       type: object
       required:
@@ -286,27 +307,3 @@ components:
         type:
           type: string
           enum: [property, environment]
-    FeatureRunnerResponse:
-      type: object
-      required:
-        - id
-        - reportHtml
-        - reportJson
-        - reportPretty
-        - state
-      properties:
-        id:
-          type: string
-        reportHtmlId:
-          type: string
-        reportJson:
-          type: array
-          items:
-            type: string
-        reportPretty:
-          type: array
-          items:
-            type: string
-        state:
-          type: string
-          enum: [success, failure, error]

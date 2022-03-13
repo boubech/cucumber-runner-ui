@@ -37,11 +37,12 @@ public class TestRunnerCommandLine {
         List<String> command = getInterpreterCommand();
         List<String> interpreterArgs = new ArrayList<>();
         interpreterArgs.add("java");
-        Optional.ofNullable(testExecutionContext.getEnvironments().get("JAVA_OPTS")).ifPresent(interpreterArgs::add);
+        Optional.ofNullable(testExecutionContext.getEnvironments().get("JAVA_OPTS"))
+                .ifPresent(interpreterArgs::add);
 
-        testExecutionContext.getProperties()
-                .entrySet()
-                .forEach(property -> interpreterArgs.add("\"-D" + property.getKey().trim() + "=" + property.getValue().trim() + "\""));
+        testExecutionContext
+                .getProperties()
+                .forEach((key, value) -> interpreterArgs.add("\"-D" + key.trim() + "=" + value.trim() + "\""));
 
         interpreterArgs.add("-cp");
         interpreterArgs.add(getClassPath());
@@ -57,7 +58,6 @@ public class TestRunnerCommandLine {
         this.loggerService.log(" \u001b[36m " + this.workspaceService.getRoot().getName() + "/ ~\u001b[0m " + String.join(" ", command) + " '" + String.join(" ", interpreterArgs) + "'");
 
         command.add(String.join(" ", interpreterArgs));
-
 
         CompletableFuture.runAsync(() -> {
             try {

@@ -8,9 +8,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Component
 public class WorkspaceService {
@@ -34,9 +37,7 @@ public class WorkspaceService {
 
     public void add(String filename, MultipartFile multipartFile) throws IOException {
         File file = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + filename);
-        if (!fileIsInWorkspace(file)) {
-            throw new IllegalStateException("Unable to create file " + file.getAbsolutePath() + ", file is located outside of workspace");
-        }
+        verifyFileIsInWorkspace(file);
         try (OutputStream os = new FileOutputStream(file)) {
             os.write(multipartFile.getBytes());
         }
@@ -44,22 +45,36 @@ public class WorkspaceService {
 
     public void makeDirectory(String directory) {
         File file = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + directory);
-        if (!fileIsInWorkspace(file)) {
-            throw new IllegalStateException("Unable to create directory " + file.getAbsolutePath() + ", directory is located outside of workspace");
-        } else if (!file.mkdirs()) {
+        verifyFileIsInWorkspace(file);
+        if (!file.mkdirs()) {
             throw new IllegalStateException("Unable to create directory " + file.getAbsolutePath());
         }
     }
 
-    private boolean fileIsInWorkspace(File file) {
-        return file.getAbsoluteFile().toPath().normalize().startsWith(workspaceFolder.getAbsoluteFile().toPath().normalize());
+    public void move(String src, String dest) throws IOException {
+        File srcFile = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + src);
+        File destFile = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + dest);
+        verifyFileIsInWorkspace(srcFile);
+        verifyFileIsInWorkspace(destFile);
+        Files.move(srcFile.toPath(), destFile.toPath(), REPLACE_EXISTING);
+    }
+
+    public File getFileFromPath(String path) {
+        File file = new File(workspaceFolder.getAbsolutePath() + File.separator + ".." + File.separator + path);
+        verifyFileIsInWorkspace(file);
+        return file;
+    }
+
+    private void verifyFileIsInWorkspace(File file) {
+        if (!file.getAbsoluteFile().toPath().normalize().startsWith(workspaceFolder.getAbsoluteFile().toPath().normalize())) {
+            throw new IllegalStateException("Unable to create directory " + file.getAbsolutePath() + ", directory is located outside of workspace");
+        }
     }
 
     public void delete(String filename) {
         File file = new File(filename);
-        if (!fileIsInWorkspace(file)) {
-            throw new IllegalStateException("Unable to delete file " + file.getAbsolutePath() + ", it's located outside of workspace");
-        } else if (file.isFile() && !file.delete()) {
+        verifyFileIsInWorkspace(file);
+        if (file.isFile() && !file.delete()) {
             throw new IllegalStateException("Unable to delete file " + file.getAbsolutePath());
         } else if (file.isDirectory()) {
             try {
@@ -73,7 +88,6 @@ public class WorkspaceService {
     public String[] list() {
         return workspaceFolder.list();
     }
-
 
     public File getRoot() {
         return workspaceFolder;

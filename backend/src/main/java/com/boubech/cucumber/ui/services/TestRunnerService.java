@@ -32,6 +32,6 @@ public class TestRunnerService {
     }
 
     public void onFailed(TestExecutionContext testExecutionContext) {
-        testExecutionContext.setState(TestExecutionContext.State.FAILED);
+        testExecutionContext.setState(testExecutionContext.getJsonReport().exists() ? TestExecutionContext.State.FAILED : TestExecutionContext.State.ERROR);
     }
 }

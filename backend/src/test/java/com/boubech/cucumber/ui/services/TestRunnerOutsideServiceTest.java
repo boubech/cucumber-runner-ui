@@ -18,8 +18,8 @@ import static org.mockito.Mockito.mock;
 class TestRunnerOutsideServiceTest {
 
     private final WorkspaceService workspaceService = new WorkspaceService(new File(System.getProperty("java.io.tmpdir") + File.separator + "workspace"));
-    private final DynamiqueClassLoadService dynamiqueClassLoadService = new DynamiqueClassLoadService(workspaceService);
-    private final CucumberService cucumberService = new CucumberService(dynamiqueClassLoadService);
+    private final WorkspaceClassLoader workspaceClassLoader = new WorkspaceClassLoader(workspaceService);
+    private final CucumberService cucumberService = new CucumberService(workspaceClassLoader);
     private final LoggerService loggerService = mock(LoggerService.class);
     private final TestRunnerCommandLine testRunnerCommandLine = new TestRunnerCommandLine(loggerService, cucumberService, workspaceService);
 

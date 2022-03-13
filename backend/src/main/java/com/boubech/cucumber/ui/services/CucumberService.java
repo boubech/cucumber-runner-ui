@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class CucumberService {
 
-    private final DynamiqueClassLoadService dynamiqueClassLoadService;
+    private final WorkspaceClassLoader workspaceClassLoader;
     private final String[] packageScanExclusions = new String[]{
             "org.assertj.core",
             "org.assertj.core",
@@ -25,13 +25,13 @@ public class CucumberService {
             "org.junit"
     };
 
-    public CucumberService(DynamiqueClassLoadService dynamiqueClassLoadService) {
-        this.dynamiqueClassLoadService = dynamiqueClassLoadService;
+    public CucumberService(WorkspaceClassLoader workspaceClassLoader) {
+        this.workspaceClassLoader = workspaceClassLoader;
     }
 
     public List<Glue> getGluesDefinitions() {
         try {
-            return this.dynamiqueClassLoadService.getClasses()
+            return this.workspaceClassLoader.getClasses()
                     .stream()
                     .filter(this::excludeThirdLib)
                     .map(this::getCucumberStep)
@@ -53,26 +53,22 @@ public class CucumberService {
     }
 
     private List<Glue> getCucumberStep(Class<?> aClass) {
-        try {
-            return Arrays.stream(aClass.getMethods())
-                    .map(method -> this.getStepValue(aClass, method))
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
-        } catch (Throwable e) {
-            return Collections.emptyList();
-        }
+        return Arrays.stream(aClass.getMethods())
+                .map(this::getStepValue)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
 
     public List<Class<?>> getCucumberGlueClass() throws IOException {
-        return this.dynamiqueClassLoadService.getClasses()
+        return this.workspaceClassLoader.getClasses()
                 .stream()
                 .filter(this::excludeThirdLib)
-                .filter(clazz -> Arrays.stream(clazz.getMethods()).anyMatch(method -> !getStepValue(clazz, method).isEmpty()))
+                .filter(clazz -> Arrays.stream(clazz.getMethods()).anyMatch(method -> !getStepValue(method).isEmpty()))
                 .collect(Collectors.toList());
     }
 
-    private List<Glue> getStepValue(Class clazz, Method method) {
+    private List<Glue> getStepValue(Method method) {
         if (method.getAnnotations() == null || method.getAnnotations().length == 0) {
             return Collections.emptyList();
         }

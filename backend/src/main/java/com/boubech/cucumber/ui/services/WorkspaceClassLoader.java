@@ -16,15 +16,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Component
-public class DynamiqueClassLoadService {
+public class WorkspaceClassLoader {
 
     private final WorkspaceService workspaceService;
 
-    public DynamiqueClassLoadService(WorkspaceService workspaceService) {
+    public WorkspaceClassLoader(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
     }
 
-    public URLClassLoader get() {
+    private URLClassLoader get() {
         List<File> files = this.workspaceService.listFiles();
         URL[] urls = files.stream()
                 .map(File::toURI)
@@ -34,25 +34,24 @@ public class DynamiqueClassLoadService {
                     } catch (MalformedURLException e) {
                         return null;
                     }
-                })
-                .collect(Collectors.toList())
-                .toArray(new URL[0]);
+                }).toArray(URL[]::new);
         return new URLClassLoader(urls);
     }
 
     public List<Class<?>> getClasses() throws IOException {
-        final URLClassLoader classLoader = get();
-        return getClassNames()
-                .stream()
-                .map(className -> {
-                    try {
-                        return classLoader.loadClass(className);
-                    } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        try (URLClassLoader classLoader = get()) {
+            return getClassNames()
+                    .stream()
+                    .map(className -> {
+                        try {
+                            return classLoader.loadClass(className);
+                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
     }
 
     private List<String> getClassNames() throws IOException {
