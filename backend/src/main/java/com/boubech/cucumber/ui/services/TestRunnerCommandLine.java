@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import java.util.stream.Collectors;
@@ -49,13 +50,13 @@ public class TestRunnerCommandLine {
         interpreterArgs.add("io.cucumber.core.cli.Main");
         interpreterArgs.add(getRelativePath(testExecutionContext.getFeature(), workspaceService.getRoot()));
 
-        gluesClasses.forEach(clazz -> addGlueToArg(interpreterArgs, clazz));
+        getGluesPackages(gluesClasses).forEach(packageName -> addGlueToArg(interpreterArgs, packageName));
 
         addPluginToArgs(interpreterArgs, "html:" + getRelativePath(testExecutionContext.getHtmlReport(), workspaceService.getRoot()));
         addPluginToArgs(interpreterArgs, "json:" + getRelativePath(testExecutionContext.getJsonReport(), workspaceService.getRoot()));
         addPluginToArgs(interpreterArgs, "pretty:" + getRelativePath(testExecutionContext.getPrettyReport(), workspaceService.getRoot()));
 
-        this.loggerService.log(" \u001b[36m " + this.workspaceService.getRoot().getName() + "/ ~\u001b[0m " + String.join(" ", command) + " '" + String.join(" ", interpreterArgs) + "'");
+        this.loggerService.log(testExecutionContext," \u001b[36m " + this.workspaceService.getRoot().getName() + "/ ~\u001b[0m " + String.join(" ", command) + " '" + String.join(" ", interpreterArgs) + "'");
 
         command.add(String.join(" ", interpreterArgs));
 
@@ -71,6 +72,29 @@ public class TestRunnerCommandLine {
                 onFailed.accept(testExecutionContext);
             }
         });
+    }
+
+    private List<String> getGluesPackages(List<Class<?>> gluesClasses) {
+        List<String> distinctPackages = gluesClasses.stream()
+                .map(Class::getPackageName)
+                .distinct()
+                .collect(Collectors.toList());
+
+        AtomicBoolean deduplicated = new AtomicBoolean(false);
+        do {
+            deduplicated.set(false);
+            new ArrayList<>(distinctPackages).forEach(packageName -> {
+                List<String> childPackages = distinctPackages.stream()
+                        .filter(i -> !i.equals(packageName) && i.startsWith(packageName))
+                        .collect(Collectors.toList());
+                if (!childPackages.isEmpty()) {
+                    deduplicated.set(true);
+                }
+                distinctPackages.removeAll(childPackages);
+            });
+        } while (deduplicated.get());
+
+        return distinctPackages;
     }
 
     public String getRelativePath(File file, File relativeFrom) {
@@ -114,7 +138,7 @@ public class TestRunnerCommandLine {
                 if (line == null) {
                     continue;
                 }
-                this.loggerService.log(line);
+                this.loggerService.log(testExecutionContext, line);
                 testExecutionContext.getLog().add(line);
                 fw.write(line + "\n");
             } while (p.isAlive());
@@ -129,9 +153,9 @@ public class TestRunnerCommandLine {
     }
 
 
-    private void addGlueToArg(List<String> arguments, Class<?> clazz) {
+    private void addGlueToArg(List<String> arguments, String packageName) {
         arguments.add("--glue");
-        arguments.add(clazz.getPackageName());
+        arguments.add(packageName);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.boubech.cucumber.ui.api;
 
 import com.boubech.cucumber.ui.converters.TestExecutionContextToTestResult;
-import com.boubech.cucumber.ui.model.FeatureRunnerOptionRequest;
+import com.boubech.cucumber.ui.model.ModelConfiguration;
 import com.boubech.cucumber.ui.model.TestRequest;
 import com.boubech.cucumber.ui.model.TestResponse;
 import com.boubech.cucumber.ui.services.TestExecutionContext;
@@ -35,8 +35,8 @@ public class TestApiDelegateImpl implements TestApiDelegate {
     @Override
     public ResponseEntity<TestResponse> runTest(TestRequest testRequest) {
         try {
-            Map<String, String> properties = testRequest.getOptions().stream().filter(o -> o.getType().equals(FeatureRunnerOptionRequest.TypeEnum.PROPERTY)).collect(Collectors.toMap(FeatureRunnerOptionRequest::getKey, FeatureRunnerOptionRequest::getValue));
-            Map<String, String> environments = testRequest.getOptions().stream().filter(o -> o.getType().equals(FeatureRunnerOptionRequest.TypeEnum.ENVIRONMENT)).collect(Collectors.toMap(FeatureRunnerOptionRequest::getKey, FeatureRunnerOptionRequest::getValue));
+            Map<String, String> properties = testRequest.getOptions().stream().filter(o -> o.getType().equals(ModelConfiguration.TypeEnum.PROPERTY)).collect(Collectors.toMap(ModelConfiguration::getKey, ModelConfiguration::getValue));
+            Map<String, String> environments = testRequest.getOptions().stream().filter(o -> o.getType().equals(ModelConfiguration.TypeEnum.ENVIRONMENT)).collect(Collectors.toMap(ModelConfiguration::getKey, ModelConfiguration::getValue));
             TestExecutionContext testExecutionContext = this.workspaceService.createNewTestExecutionContext(properties, environments);
             Files.write(testExecutionContext.getFeature().toPath(), testRequest.getFeature(), StandardCharsets.UTF_8);
             this.testRunnerService.run(testExecutionContext);

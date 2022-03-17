@@ -20,6 +20,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import {AutoCompletionService} from './auto-completion-service';
 import {GherkinHighlightRulesService} from './gherkin-hightlight-rules.service';
 import {GlueResponse} from 'src/app/api/models';
+import {TestResultMapperService} from "./test-result-mapper.service";
 
 
 export interface TestResult {
@@ -39,16 +40,14 @@ export class FeatureEditorComponent {
 
 
   @Input() test: Test | undefined;
+  @Input() language: string | undefined;
   @Input() glues: Array<GlueResponse> = [];
   @Output() onTestChange = new EventEmitter<Test>();
   @Output() onContentEditorChanged = new EventEmitter<string>();
+  @Output() onLanguageChanged = new EventEmitter<string>();
 
   running: boolean = false;
   codeEditor: any;
-  testResult: TestResult | undefined;
-  languages: Array<string> | undefined;
-  languageSelected: string = 'en';
-
 
   @ViewChild('editorDiv') editor: ElementRef | undefined;
 
@@ -57,6 +56,7 @@ export class FeatureEditorComponent {
               private _gherkinHighlightRulesService: GherkinHighlightRulesService,
               private _rendered: Renderer2,
               private _cdr: ChangeDetectorRef,
+              private _testResultMapperService: TestResultMapperService,
               @Inject(DOCUMENT) private document: Document) {
   }
 
@@ -66,7 +66,6 @@ export class FeatureEditorComponent {
 
   initCodeEditor(config: any): void {
     this._gherkinHighlightRulesService.init();
-    this.languages = this._gherkinHighlightRulesService.getLanguagesAvailables();
     const options = {
       value: this.test?.feature,
       minLines: 20,
@@ -81,24 +80,48 @@ export class FeatureEditorComponent {
 
     const element = this.editor!.nativeElement;
     this.codeEditor = ace.edit(element, options);
-    this.codeEditor.session.setMode('ace/mode/gherkin');
+    this.codeEditor.session.setMode(this._gherkinHighlightRulesService.getMode());
     this.codeEditor.setShowFoldWidgets(true);
-    this.codeEditor.setFontSize('1rem');
+    this.codeEditor.setFontSize('0.9rem');
     this.codeEditor.setTheme('ace/theme/chrome');
     let self = this;
     this.codeEditor.session.on('tokenizerUpdate', function () {
       self.test!.feature = self.codeEditor.session.getValue();
+      self.detectLanguageChange();
       self.onContentEditorChanged.emit(self.test!.feature);
+    })
+    this.codeEditor.session.on("changeScrollTop", function () {
+      self.test!.testResult = self.mapTestResult();
+    })
+    this.codeEditor.session.on("changeScrollLeft", function () {
+      self.test!.testResult = self.mapTestResult();
     })
   }
 
-  onLanguageChange(event: any) {
-    console.log(event)
-    this._gherkinHighlightRulesService.setLanguages(event);
+  detectLanguageChange() {
+    let langToConfigure = undefined;
+    let lineDetected = this.test!.feature.split('\n').find(line => line.trim().startsWith('#language:'));
+    if (lineDetected) {
+      let langDefined = lineDetected.split(':')[1].trim();
+      if (langDefined) {
+        this._gherkinHighlightRulesService.getLanguagesAvailables()
+                                          .filter(langAvailable => langAvailable == langDefined)
+                                          .forEach(lang => langToConfigure = lang);
+      }
+    }
+    if (langToConfigure == undefined) {
+      langToConfigure = this._gherkinHighlightRulesService.getDefaultLanguage();
+    }
+    if (!this.language || langToConfigure != this.language) {
+      this.language = langToConfigure;
+      this._gherkinHighlightRulesService.setLanguages(this.language!);
+      this.onLanguageChanged.emit(this.language)
+    }
   }
 
   run(): void {
     this.running = true;
+    this.test!.cucumberReport = undefined;
     const self = this;
     let getTestResult = () => {
       self._testRunnerService.get(self.test!).subscribe({
@@ -118,7 +141,7 @@ export class FeatureEditorComponent {
       });
     };
 
-    this._testRunnerService.run2(this.test!).subscribe(() => getTestResult())
+    this._testRunnerService.run(this.test!).subscribe(() => getTestResult())
   }
 
   stop() {
@@ -126,20 +149,21 @@ export class FeatureEditorComponent {
     this.test!.state = undefined
   }
 
-  private shouldReloadTest(test: Test) : boolean {
-    return  test.state == undefined || 
-            test.state == 'running' || 
-            test.reportJson == undefined || 
-            test.reportPretty == undefined
+  shouldReloadTest(test: Test): boolean {
+    return test.state == undefined ||
+      test.state == 'running' ||
+      test.reportPretty == undefined ||
+      test.reportHtmlId == undefined ||
+      test.cucumberReport == undefined
   }
 
   parseTestResult(test: Test): void {
     this.test!.id = test.id;
     this.test!.reportPretty = test.reportPretty;
     this.test!.reportHtmlId = test.reportHtmlId;
-    this.test!.reportJson = test.reportJson;
+    this.test!.cucumberReport = test.cucumberReport;
     this.test!.state = test.state;
-    switch(this.test?.state) {
+    switch (this.test?.state) {
       case 'running':
         break;
       case 'failure':
@@ -147,60 +171,19 @@ export class FeatureEditorComponent {
       case 'error':
         this.running = false;
         this.onTestChange.emit(this.test);
-        this.parseJsonResult();
+        this.test.testResult = this.mapTestResult();
         break;
     }
   }
 
-  parseJsonResult(): void {
-    if (this.test?.reportJson && this.test?.reportJson.length > 0) {
-      let jsonResult = JSON.parse(this.test.reportJson.join(""));
-      let lines = this.editor?.nativeElement.querySelectorAll('.ace_line');
-      this.resetLineStyles(lines);
-      let testResult: TestResult = {stepFailures: 0, stepRun: 0, stepSkippeds:0, scenarioFailures:0, scenarioRun: 0}
-      this.testResult = undefined;
-      if (jsonResult[0]) {
-        jsonResult[0].elements.forEach((scenario: any) => this.parseJsonResultScenario(testResult, scenario, lines))
-      }
-      this.testResult = testResult;
+
+  private mapTestResult(): TestResult | undefined {
+    if (this.test!.cucumberReport && this.editor) {
+      return this._testResultMapperService.mapTestResult(this.test!.cucumberReport, this.editor, this._rendered);
+    } else {
+      return undefined;
     }
   }
 
-  private parseJsonResultScenario(testResult: TestResult, scenario: any, lines: any) {
-    testResult.scenarioRun = testResult.scenarioRun + 1;
-    let errorOcccured = false;
-    for (let step of scenario.steps) {
-      if (!step.line || step.line > lines.length){
-        continue;
-      }
-      this._rendered.addClass(lines[step.line - 1], step.result.status);
-      switch (step.result.status) {
-        case 'passed':
-          testResult.stepRun = testResult.stepRun + 1;
-          break;
-        case 'failed':
-          testResult.stepSkippeds = testResult.stepSkippeds + 1;
-          errorOcccured = true;
-          break;
-        case 'undefined':
-        case 'skipped':
-          testResult.stepFailures = testResult.stepFailures + 1;
-          errorOcccured = true;
-          break;
-      }
-    }
-    if (errorOcccured) {
-      testResult.scenarioFailures = testResult.scenarioFailures + 1;
-    }
-  }
-
-  private resetLineStyles(lines: any) {
-    lines.forEach((line: any) => {
-      this._rendered.removeClass(line, 'passed');
-      this._rendered.removeClass(line, 'failed');
-      this._rendered.removeClass(line, 'undefined');
-      this._rendered.removeClass(line, 'skipped');
-    })
-  }
 
 }

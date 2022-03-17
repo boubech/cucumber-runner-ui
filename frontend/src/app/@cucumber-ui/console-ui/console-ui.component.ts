@@ -1,5 +1,4 @@
 import {Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {Test} from 'src/app/services/test-runner-service';
 import {LogService} from "../../services/log-service";
 
 @Component({
@@ -17,7 +16,8 @@ export class ConsoleUiComponent implements OnInit {
 
   ngOnInit(): void {
     this._logService.getObservable()?.subscribe(response => {
-      this.lines.push(response.message.message);
+      console.log(response.message)
+      this.lines.push('#' + response.message.testExecutionContextIdentifier + ' ' + response.message.message);
       this.scrollToBottom();
     })
   }

@@ -1,6 +1,4 @@
 import {Injectable} from "@angular/core";
-import {firstValueFrom} from "rxjs";
-import {WorkspaceService} from "src/app/services/workspace-service";
 
 
 import * as ace from 'ace-builds';
@@ -18,14 +16,19 @@ export class GherkinHighlightRulesService {
     }, {
       name: "fr",
       labels: "Fonctionnalité|Contexte|Scénario|Plan du scénario|Exemples",
-      keywords: "Soit|Etant donné que|Etant donné qu'|Quand|Lorsque|Lorsqu'|Alors|Et|Mais"
+      keywords: "Soit|Etant donné|Etant donné que|Etant donné qu'|Quand|Lorsque|Lorsqu'|Alors|Et|Mais"
     }
   ];
 
-  private langueSelected: string = "en";
+  private defaultLanguage: string = "en";
+  private langueSelected: string = this.defaultLanguage;
 
   getLanguagesLabels() {
     return this.languages.filter(i => i.name == this.langueSelected).map(item => item.labels).flatMap(x => x.split('|'));
+  }
+
+  getDefaultLanguage(): string {
+    return this.defaultLanguage;
   }
 
   private getLanguagesConfiguration(): Array<any> {
@@ -40,14 +43,21 @@ export class GherkinHighlightRulesService {
     this.langueSelected = langueSelected;
   }
 
+  getMode() {
+    return "ace/mode/gherkin_" + this.langueSelected;
+  }
+
   init(): void {
+    let language = this.langueSelected
+    let baseDefinition = this.getMode();
+    let highLightName = "gherkin_" + language + "_highlight_rules"
     let self = this;
     ace.require("ace/ext/language_tools");
-    aceBuilds.define("ace/mode/gherkin_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (require: any, exports: any, module: any) {
+    aceBuilds.define("ace/mode/" + highLightName, ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (require: any, exports: any, module: any) {
 
       var oop = require("../lib/oop");
       var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-      var stringEscape = "\\\\(x[0-9A-Fa-f]{2}|[0-7]{3}|[\\\\abfnrtv'\"]|U[0-9A-Fa-f]{8}|u[0-9A-Fa-f]{4})";
+      let stringEscape: string = "\\\\(x[0-9A-Fa-f]{2}|[0-7]{3}|[\\\\abfnrtv'\"]|U[0-9A-Fa-f]{8}|u[0-9A-Fa-f]{4})";
       var GherkinHighlightRules = function (this: any) {
 
 
@@ -66,7 +76,7 @@ export class GherkinHighlightRulesService {
             regex: "#.*$"
           }, {
             token: "keyword",
-            regex: "(?:" + labels + "):|(?:" + keywords + ")\\b"
+            regex: "(?:" + labels + "):|(?:" + keywords + ")"
           }, {
             token: "keyword",
             regex: "\\*"
@@ -150,11 +160,11 @@ export class GherkinHighlightRulesService {
       exports.GherkinHighlightRules = GherkinHighlightRules;
     });
 
-    aceBuilds.define("ace/mode/gherkin", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/gherkin_highlight_rules"], function (require: any, exports: any, module: any) {
+    aceBuilds.define(baseDefinition, ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/gherkin_highlight_rules"], function (require: any, exports: any, module: any) {
 
       var oop = require("../lib/oop");
       var TextMode = require("./text").Mode;
-      var GherkinHighlightRules = require("./gherkin_highlight_rules").GherkinHighlightRules;
+      var GherkinHighlightRules = require("./" + highLightName).GherkinHighlightRules;
 
       var Mode = function (this: any) {
         this.HighlightRules = GherkinHighlightRules;
@@ -164,7 +174,7 @@ export class GherkinHighlightRulesService {
 
       (function (this: any) {
         this.lineCommentStart = "#";
-        this.$id = "ace/mode/gherkin";
+        this.$id = baseDefinition;
 
         this.getNextLineIndent = function (state: any, line: any, tab: any) {
           var indent = this.$getIndent(line);

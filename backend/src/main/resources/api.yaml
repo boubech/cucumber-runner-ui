@@ -208,6 +208,21 @@ paths:
               schema:
                 type: string
 
+  /configuration:
+    get:
+      operationId: getConfiguration
+      summary: Get default configuration
+      description: Get default configuration
+      responses:
+        '200':
+          description: Return default configuration
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Configuration"
+
 components:
   schemas:
     GlueResponse:
@@ -270,7 +285,7 @@ components:
         options:
           type: array
           items:
-            $ref: "#/components/schemas/FeatureRunnerOptionRequest"
+            $ref: "#/components/schemas/Configuration"
 
     TestResponse:
       type: object
@@ -293,7 +308,7 @@ components:
           items:
             type: string
 
-    FeatureRunnerOptionRequest:
+    Configuration:
       type: object
       required:
         - key
@@ -306,4 +321,4 @@ components:
           type: string
         type:
           type: string
-          enum: [property, environment]
+          enum: [ property, environment ]

@@ -1,5 +1,6 @@
 package com.boubech.cucumber.ui.websocket;
 
+import com.boubech.cucumber.ui.services.TestExecutionContext;
 import com.boubech.cucumber.ui.services.TestRunnerCommandLine;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,9 @@ public class LoggerService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void log(String message) {
+    public void log(TestExecutionContext testExecutionContext, String message) {
         logger.info(message);
-        messagingTemplate.convertAndSend("/topic/progress", new LogMessage("INFO", message));
+        messagingTemplate.convertAndSend("/topic/progress", new TestExecutionLogMessage(testExecutionContext.getIdentifier(), message));
     }
 
 }

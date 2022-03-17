@@ -8,11 +8,7 @@
     </span>
     <span>|</span>
     <span>
-      <mat-select>
-        <mat-option *ngFor="let lang of languages" [value]="languageSelected" (selectionChange)="onLanguageChange($event)">
-          {{lang}}
-        </mat-option>
-      </mat-select>
+      Lang : {{language}}
     </span>
   </header>
 
@@ -24,23 +20,23 @@
 
   <footer>
     <span *ngIf="test">
-      Tests status :
+      Tests results :
     </span>
-    <span *ngIf="test!.state">
-      <mat-icon name="success" matTooltip="Success" *ngIf="test!.state!.match('success')" aria-hidden="false" aria-label="success">check</mat-icon>
-      <mat-icon name="failure" matTooltip="Failure" *ngIf="test!.state!.match('failure')" aria-hidden="false" aria-label="failure">warning</mat-icon>
-      <mat-icon name="error" matTooltip="Error" *ngIf="test!.state!.match('error')" aria-hidden="false" aria-label="error">error_outline</mat-icon>
+    <span *ngIf="test && test.state">
+      <mat-icon name="success" matTooltip="Success" *ngIf="test.state.match('success')" aria-hidden="false" aria-label="success">check</mat-icon>
+      <mat-icon name="failure" matTooltip="Failure" *ngIf="test.state.match('failure')" aria-hidden="false" aria-label="failure">warning</mat-icon>
+      <mat-icon name="error" matTooltip="Error" *ngIf="test.state.match('error')" aria-hidden="false" aria-label="error">error_outline</mat-icon>
     </span>
-    <span *ngIf="testResult">|</span>
-    <span *ngIf="testResult">
-      Scenarios run: {{testResult.scenarioRun}},
-      Failures: {{testResult.scenarioFailures}}
+    <span *ngIf="test && test.testResult">|</span>
+    <span *ngIf="test && test.testResult">
+      Scenarios run: {{test.testResult.scenarioRun}},
+      Failures: {{test.testResult.scenarioFailures}}
     </span>
-    <span *ngIf="testResult">|</span>
-    <span *ngIf="testResult">
-      Steps run: {{testResult.stepRun}},
-      Failures: {{testResult.stepFailures}},
-      Skipped: {{testResult.stepSkippeds}}
+    <span *ngIf="test && test.testResult">|</span>
+    <span *ngIf="test && test.testResult">
+      Steps run: {{test.testResult.stepRun}},
+      Failures: {{test.testResult.stepFailures}},
+      Skipped: {{test.testResult.stepSkippeds}}
     </span>
   </footer>
 </section>

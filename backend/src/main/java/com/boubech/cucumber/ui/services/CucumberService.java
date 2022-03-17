@@ -53,10 +53,14 @@ public class CucumberService {
     }
 
     private List<Glue> getCucumberStep(Class<?> aClass) {
-        return Arrays.stream(aClass.getMethods())
-                .map(this::getStepValue)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        try {
+            return Arrays.stream(aClass.getMethods())
+                    .map(this::getStepValue)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+        } catch (Throwable e) {
+            return new ArrayList<>();
+        }
     }
 
 
@@ -64,8 +68,16 @@ public class CucumberService {
         return this.workspaceClassLoader.getClasses()
                 .stream()
                 .filter(this::excludeThirdLib)
-                .filter(clazz -> Arrays.stream(clazz.getMethods()).anyMatch(method -> !getStepValue(method).isEmpty()))
+                .filter(this::hasStepDef)
                 .collect(Collectors.toList());
+    }
+
+    private boolean hasStepDef(Class<?> clazz) {
+        try {
+            return Arrays.stream(clazz.getMethods()).anyMatch(method -> !getStepValue(method).isEmpty());
+        } catch (Throwable e) {
+            return false;
+        }
     }
 
     private List<Glue> getStepValue(Method method) {

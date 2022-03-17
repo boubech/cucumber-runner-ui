@@ -2,17 +2,18 @@ import {Injectable} from "@angular/core";
 import {ApiConfiguration} from "../api/api-configuration";
 import {map, Observable} from "rxjs";
 import {ApiService} from "../api/services/api.service";
-import {FeatureRunnerOptionRequest} from "../api/models/feature-runner-option-request";
-import { TestResponse } from "../api/models";
+import {Configuration, TestResponse} from "../api/models";
+import {TestResult} from "../@cucumber-ui/feature-editor/feature-editor.component";
 
 export interface Test {
   feature: string;
   id?: string;
   reportHtmlId?: string;
-  reportJson?: Array<string>;
   reportPretty?: Array<string>;
-  settings: Array<Setting>;
+  settings?: Array<Setting>;
   state?: 'running' | 'success' | 'failure' | 'error'
+  cucumberReport?: any;
+  testResult?: TestResult
 }
 
 export interface Setting {
@@ -31,37 +32,20 @@ export class TestRunnerService {
     return this._apiConfiguration.rootUrl + "/html-reports/" + test.id;
   }
 
-  run(test: Test): Observable<Test> {
-    let options: FeatureRunnerOptionRequest[] = test.settings.map(setting => {
-      return {key: setting.key, value: setting.value, type: setting.type}
-    });
-    return this._apiService.runFeature({body: {feature: test.feature.split("\n"), options: options}}).pipe(map(response => {
-      test.id = response.id;
-      test.reportHtmlId = response.reportHtmlId;
-      test.reportJson = response.reportJson;
-      test.reportPretty = response.reportPretty;
-      switch (response.state) {
-        case "error":
-          test.state = 'error';
-          break;
-        case "failure":
-          test.state = 'failure';
-          break;
-        case "success":
-          test.state = 'success';
-          break;
-        default:
-          break;
-      }
-      return test;
-    }));
+  getDefaultSettings(): Observable<Configuration[]> {
+    return this._apiService.getConfiguration();
   }
 
-  run2(test: Test): Observable<Test> {
-    let options: FeatureRunnerOptionRequest[] = test.settings.map(setting => {
+  run(test: Test): Observable<Test> {
+    let options: Configuration[] = test.settings!.map(setting => {
       return {key: setting.key, value: setting.value, type: setting.type}
     });
-    return this._apiService.runTest({body: {feature: test.feature.split("\n"), options: options}}).pipe(map(response => {
+    return this._apiService.runTest({
+      body: {
+        feature: test.feature.split("\n"),
+        options: options
+      }
+    }).pipe(map(response => {
       return this.mapTestReponseToTest(response, test);
     }));
   }
@@ -71,12 +55,16 @@ export class TestRunnerService {
       return this.mapTestReponseToTest(response, test);
     }));
   }
-  
+
   private mapTestReponseToTest(response: TestResponse, test: Test): Test {
     test.id = response.id;
     test.reportHtmlId = response.reportHtmlId;
-    test.reportJson = response.reportJson;
     test.reportPretty = response.reportPretty;
+    if (response.reportJson && response.reportJson.length > 0) {
+      test.cucumberReport = JSON.parse(response.reportJson.join(""));
+    } else {
+      test.cucumberReport = undefined;
+    }
     switch (response.status) {
       case "error":
         test.state = 'error';

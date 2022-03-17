@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {FeatureRunnerResponse} from "../api/models/feature-runner-response";
 import {WorkspaceService} from "../services/workspace-service";
 import {FileResponse} from "../api/models/file-response";
 import {GlueResponse} from '../api/models';
@@ -16,6 +15,8 @@ export class CucumberUiComponent implements OnInit {
   glues: GlueResponse[] | undefined;
   editorEnabled: boolean = true;
 
+  editorLanguage: string = 'en';
+
   test: Test = {
     feature: 'Feature: Addition \n' +
       '  Scenario: Nominal test \n' +
@@ -23,25 +24,24 @@ export class CucumberUiComponent implements OnInit {
       '    When add -1 \n' +
       '    Then the result is 0 \n' +
       '    Then the result is 1',
-    settings: [
-      {key: "JAVA_OPTS", value: '-Xmx128M', type: "environment"},
-      {key: "cucumber.publish.quiet", value: 'true', type: "property"}
-    ]
+    settings: undefined
   };
-  featureRunnerResponse: FeatureRunnerResponse | undefined;
+
   htmlReportUrl: string | undefined;
 
   constructor(private _workspaceService: WorkspaceService,
               private _changeDetector: ChangeDetectorRef,
-  private _testRunnerService: TestRunnerService) {
+              private _testRunnerService: TestRunnerService) {
   }
 
   ngOnInit(): void {
     this.refresh();
+    this._testRunnerService.getDefaultSettings().subscribe(settings => {
+      this.test.settings = settings!
+    })
   }
 
   refresh() {
-    console.log("refresh")
     this.refreshGlues();
     this.refreshWorkspace();
   }
@@ -59,17 +59,19 @@ export class CucumberUiComponent implements OnInit {
     });
   }
 
-
-  onFeatureEditorChange(featureRunnerResponse: FeatureRunnerResponse) {
-    this.featureRunnerResponse = featureRunnerResponse;
-  }
-
   onTestChange(test: Test) {
     this.test = test;
     this.refreshWorkspace();
     if (test.reportHtmlId) {
       this.htmlReportUrl = this._testRunnerService.getHtmlReportUrlFromTest(test);
     }
+  }
+
+  onLanguageChanged(language: string) {
+    this.editorLanguage = language;
+    this.editorEnabled = false;
+    this._changeDetector.detectChanges();
+    this.editorEnabled = true;
   }
 
 }

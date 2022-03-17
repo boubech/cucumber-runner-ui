@@ -14,6 +14,7 @@ public class DirectoryApiDelegateImpl implements DirectoryApiDelegate {
         this.workspaceService = workspaceService;
     }
 
+    @Override
     public ResponseEntity<String> makeDirectory(InlineObject inlineObject) {
         try {
             workspaceService.makeDirectory(inlineObject.getDirectory());

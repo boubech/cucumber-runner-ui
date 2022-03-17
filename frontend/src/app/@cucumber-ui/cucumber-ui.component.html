@@ -12,8 +12,12 @@
     </span>
   </mat-grid-tile>
   <mat-grid-tile colspan="3" class="editor" rowspan="2">
-    <app-feature-editor (onTestChange)="onTestChange($event)" *ngIf="editorEnabled && glues"
+    <app-feature-editor
+                        *ngIf="editorEnabled && glues"
+                        (onTestChange)="onTestChange($event)"
+                        (onLanguageChanged)="onLanguageChanged($event)"
                         [test]="test"
+                        [language]="editorLanguage"
                         [glues]="glues">
     </app-feature-editor>
     <span *ngIf="!editorEnabled || !glues">
@@ -35,7 +39,7 @@
           <mat-icon class="tab-icon">settings</mat-icon>
           <span class="tab-label">Settings</span>
         </ng-template>
-        <table class="settings">
+        <table class="settings" *ngIf="test.settings">
           <caption></caption>
           <tbody>
             <tr>

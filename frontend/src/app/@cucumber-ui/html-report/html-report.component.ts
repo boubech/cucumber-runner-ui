@@ -1,6 +1,4 @@
-import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
-import {FeatureRunnerResponse} from "../../api/models/feature-runner-response";
-import {Test, TestRunnerService} from "../../services/test-runner-service";
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-html-report',
@@ -11,8 +9,6 @@ export class HtmlReportComponent{
 
   @Input() htmlReportUrl: string | undefined;
 
-  constructor(private _testRunnerService: TestRunnerService) {
+  constructor() {
   }
-
-
 }

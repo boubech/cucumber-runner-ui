@@ -1,0 +1,12 @@
+spring.servlet.multipart:
+  max-file-size: 250MB
+  max-request-size: 250MB
+springdoc.api-docs.path: /api-docs
+
+
+configuration:
+  environments:
+    JAVA_OPTS: -Xmx256M
+  properties:
+    'cucumber.publish.quiet': true
+    'java.io.tmpdir': '.'

@@ -45,7 +45,7 @@ public class WorkspaceClassLoader {
                     .map(className -> {
                         try {
                             return classLoader.loadClass(className);
-                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                        } catch (Throwable e) {
                             return null;
                         }
                     })
