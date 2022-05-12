@@ -1,16 +1,8 @@
-<section>
-  <header>
-    Workspace
-  </header>
-  <div>
-    <app-file-item *ngFor="let file of fileExplorerItems"
-                   [file]="file"
-                   (onDelete)="onDeleteEvent($event)"
-                   (onUpload)="onUploadEvent($event)"
-                   (onUpdate)="onUpdateEvent($event)"
-    ></app-file-item>
-  </div>
-  <footer>
-
-  </footer>
-</section>
+<div>
+  <app-file-item *ngFor="let file of fileExplorerItems"
+                 [file]="file"
+                 (onDelete)="onDeleteEvent($event)"
+                 (onUpload)="onUploadEvent($event)"
+                 (onUpdate)="onUpdateEvent($event)"
+  ></app-file-item>
+</div>

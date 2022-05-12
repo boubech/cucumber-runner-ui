@@ -6,7 +6,15 @@
   font-size: 1rem;
 }
 .file {
-  padding-left: 1.5pc;
+  #padding-left: 1.5pc;
+}
+.file mat-icon {
+  margin-left: 35px;
+}
+
+.directory .open,
+.directory .close {
+  margin-left: 5px;
 }
 
 .file span,
@@ -15,12 +23,7 @@
   vertical-align:middle;
   padding-left: 0.5pc;
   cursor: default;
-}
-
-.directory .open,
-.directory .close {
-  margin-right: 0px;
-  margin-left: 0px;
+  height: 30px;
 }
 
 .open:hover,
@@ -41,4 +44,18 @@
 
 .selected {
   background-color: #dddddd;
+}
+
+.file mat-icon,
+.directory mat-icon,
+.file span,
+.directory span {
+  display: inline;
+}
+
+.file span,
+.directory span {
+  padding-bottom: 15px;
+  width: auto;
+  white-space:nowrap;
 }

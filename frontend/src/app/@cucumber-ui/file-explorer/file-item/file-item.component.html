@@ -21,7 +21,7 @@
   </div>
   <div>
     <div class="directory-content" *ngIf="file!.isDirectory && file!.showContent">
-      <app-file-item class="subfile" *ngFor="let subfile of file!.files"
+      <app-file-item class="subfile" *ngFor="let subfile of file!.files "
                      [file]="subfile"
                      (onDelete)="onDeleteEvent($event)"
                      (onUpdate)="onUpdateEvent($event)"

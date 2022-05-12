@@ -1,17 +1,30 @@
-<mat-grid-list cols="4" class="main" rowHeight="33.25%">
-  <mat-grid-tile colspan="1" class="explorer" rowspan="2">
-    <app-file-explorer [files]="files"
-                       (fileUploaded)="refresh()"
-                       (filesDeleted)="refresh()"
-                       (filesUpdated)="refresh()"
-                       *ngIf="files"
-    >
-    </app-file-explorer>
+<mat-grid-list cols="10" class="main" rowHeight="33.25%">
+  <mat-grid-tile colspan="2"
+                 class="left-panel"
+                 rowspan="2"
+  >
+    <section>
+      <header>
+          Workspace
+      </header>
+      <div>
+        <app-file-explorer [files]="files"
+                           (fileUploaded)="refresh()"
+                           (filesDeleted)="refresh()"
+                           (filesUpdated)="refresh()"
+                           *ngIf="files"
+        >
+        </app-file-explorer>
+      </div>
+      <footer>
+
+      </footer>
+    </section>
     <span *ngIf="!files">
       Loading workspace...
     </span>
   </mat-grid-tile>
-  <mat-grid-tile colspan="3" class="editor" rowspan="2">
+  <mat-grid-tile colspan="8" class="editor" rowspan="2">
     <app-feature-editor
                         *ngIf="editorEnabled && glues"
                         (onTestChange)="onTestChange($event)"
@@ -24,7 +37,7 @@
       Loading editor...
     </span>
   </mat-grid-tile>
-  <mat-grid-tile  class="bottom-bar" colspan="4" rowspan="1">
+  <mat-grid-tile  class="bottom-bar" colspan="10" rowspan="1">
     <mat-tab-group class="mat-tab-fill-height">
       <mat-tab>
         <ng-template mat-tab-label>

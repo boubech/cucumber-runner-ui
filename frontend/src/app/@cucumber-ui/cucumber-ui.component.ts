@@ -14,7 +14,6 @@ export class CucumberUiComponent implements OnInit {
   files: FileResponse[] | undefined;
   glues: GlueResponse[] | undefined;
   editorEnabled: boolean = true;
-
   editorLanguage: string = 'en';
 
   test: Test = {

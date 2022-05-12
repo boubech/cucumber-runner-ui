@@ -1,38 +1,4 @@
-section {
-  display: flex;
-  flex-flow: column;
-  width: 100%;
-  height: 100%;
-}
 
-header {
-  border-bottom: 1px solid white;
-  height: 2rem;
-  vertical-align: middle;
-  line-height: 2rem;
-  text-indent: 1rem;
-}
-
-div {
-  flex: 1;
-  overflow: auto;
-  padding: 1rem;
-}
-
-footer {
-  height: 2rem;
-  border-top: 1px solid white;
-  text-indent: 1rem;
-}
-
-footer .mat-icon {
-  line-height: 2rem;
-  color: rgb(71, 71, 71);
-}
-
-footer .mat-icon:hover {
-  color: black;
-}
 
 .selected {
   background-color: #dddddd;
@@ -46,4 +12,9 @@ footer .mat-icon:hover {
 .not-active:hover {
   opacity: 0.5;
   color: black;
+}
+
+app-file-item {
+  display: block;
+  width: auto;
 }

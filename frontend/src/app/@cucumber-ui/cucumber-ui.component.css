@@ -21,26 +21,68 @@
   background-color: #e1e1e1;
 }
 
-.explorer {
+.left-panel {
   background-color: #e1e1e1;
 }
 
-.explorer {
+.left-panel {
   overflow: auto;
 }
 
-.explorer app-file-explorer {
-  width: 100%;
-}
 
-.explorer app-file-explorer {
+.left-panel section {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
   height: 100%;
 }
 
+.left-panel header {
+  border-bottom: 1px solid white;
+  height: 2rem;
+  vertical-align: middle;
+  line-height: 2rem;
+  text-indent: 1rem;
+}
+
+.left-panel div {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.left-panel footer {
+  height: 2rem;
+  border-top: 1px solid white;
+  text-indent: 1rem;
+}
+
+.left-panel app-file-explorer {
+  width: 100%;
+}
+
+.left-panel app-file-explorer {
+  height: 100%;
+}
+mat-grid-tile.reduced span {
+  padding: 5px;
+  writing-mode: vertical-lr;
+  transform: scale(-1, -1);
+  width: 20px!important;
+}
+
+mat-grid-tile.reduced {
+  width: 20px!important;
+}
 app-feature-editor {
   height: 100%;
   width: 100%;
 }
+
+
+
+
+
 
 .settings td {
   vertical-align: top;
