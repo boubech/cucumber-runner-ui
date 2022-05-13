@@ -1,4 +1,8 @@
 <section>
+  <mat-form-field floatLabel="never" appearance="outline">
+    <input type="search" placeholder="Search" aria-label="Number" [(ngModel)]="filter" matInput (change)="search()"/>
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
   <table>
     <thead>
     <tr>
@@ -10,7 +14,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let glue of glues">
+    <tr *ngFor="let glue of gluesFiltered">
       <td>{{glue.type}}</td>
       <td>{{glue.value}}</td>
       <td>{{glue.clazz}}</td>
