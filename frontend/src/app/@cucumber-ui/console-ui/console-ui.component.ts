@@ -9,7 +9,8 @@ import {LogService} from "../../services/log-service";
 export class ConsoleUiComponent implements OnInit {
 
   lines: string[] = [];
-  @ViewChild('console') console: ElementRef | undefined;
+  @ViewChild('console') console: any;
+  wrapLine: boolean = false;
 
   constructor(private _logService: LogService) {
   }
@@ -24,8 +25,15 @@ export class ConsoleUiComponent implements OnInit {
 
   scrollToBottom() {
     if (this.console) {
-      this.console.nativeElement.scrollTop = this.console.nativeElement.scrollTopMax;
+      this.console.elementRef.nativeElement.scrollTop = this.console.elementRef.nativeElement.scrollTopMax;
     }
   }
 
+  clearConsole() {
+    this.lines = []
+  }
+
+  enableWrapLine() {
+    this.wrapLine = !this.wrapLine;
+  }
 }

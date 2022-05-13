@@ -27,6 +27,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
+import {MatSidenavModule} from "@angular/material/sidenav";
 
 @NgModule({
   declarations: [
@@ -40,26 +41,27 @@ import { MatOptionModule } from '@angular/material/core';
     SpaceToHtml,
     SafeResourceUrlPipe
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    CommonModule,
-    CucumberUiModule,
-    BrowserAnimationsModule,
-    MatIconModule,
-    MatGridListModule,
-    MatTabsModule,
-    MatTableModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        CommonModule,
+        CucumberUiModule,
+        BrowserAnimationsModule,
+        MatIconModule,
+        MatGridListModule,
+        MatTabsModule,
+        MatTableModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatInputModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatSidenavModule
+    ],
   providers: [
     RxStompService
   ],

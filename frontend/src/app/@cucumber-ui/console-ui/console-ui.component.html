@@ -1,7 +1,15 @@
-<div class="terminal" >
-  <div #console class="content">
-    <pre *ngFor="let line of lines" >
-      <div [innerHtml]="line | ansiToHtml | spaceToHtml | safeHtml"></div>
-    </pre>
-  </div>
-</div>
+<mat-sidenav-container>
+  <mat-sidenav mode="side" opened>
+    <section class="tp-section">
+      <mat-icon (click)="clearConsole()">delete</mat-icon>
+      <mat-icon (click)="enableWrapLine()" [class]="wrapLine ? 'active' : 'inactive'" >keyboard_return</mat-icon>
+    </section>
+  </mat-sidenav>
+  <mat-sidenav-content #console>
+    <section class="tp-section">
+        <pre *ngFor="let line of lines" [style.white-space]="wrapLine ? 'normal' : 'nowrap'" >
+          <span [innerHtml]="line | ansiToHtml | spaceToHtml | safeHtml"></span>
+        </pre>
+    </section>
+  </mat-sidenav-content>
+</mat-sidenav-container>
