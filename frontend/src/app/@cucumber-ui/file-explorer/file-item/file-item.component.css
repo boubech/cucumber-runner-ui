@@ -47,9 +47,7 @@
 }
 
 .file mat-icon,
-.directory mat-icon,
-.file span,
-.directory span {
+.directory mat-icon {
   display: inline;
 }
 
